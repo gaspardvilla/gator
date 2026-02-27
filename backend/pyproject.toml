@@ -10,7 +10,6 @@ dependencies = [
     "einops==0.7.0",
     "eva-decord>=0.6.1",
     "fastapi>=0.128.0",
-    "gaze3d",
     "gdown==5.2.0",
     "gradio==5.29.1",
     "hydra-core==1.3.2",
@@ -33,6 +32,3 @@ dependencies = [
     "uvicorn>=0.40.0",
     "wandb==0.16.1",
 ]
-
-[tool.uv.sources]
-gaze3d = { path = "gaze3d", editable = true }

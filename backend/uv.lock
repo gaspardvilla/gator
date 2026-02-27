@@ -381,7 +381,6 @@ dependencies = [
     { name = "einops" },
     { name = "eva-decord" },
     { name = "fastapi" },
-    { name = "gaze3d" },
     { name = "gdown" },
     { name = "gradio" },
     { name = "hydra-core" },
@@ -412,7 +411,6 @@ requires-dist = [
     { name = "einops", specifier = "==0.7.0" },
     { name = "eva-decord", specifier = ">=0.6.1" },
     { name = "fastapi", specifier = ">=0.128.0" },
-    { name = "gaze3d", editable = "gaze3d" },
     { name = "gdown", specifier = "==5.2.0" },
     { name = "gradio", specifier = "==5.29.1" },
     { name = "hydra-core", specifier = "==1.3.2" },
@@ -987,11 +985,6 @@ sdist = { url = "https://files.pythonhosted.org/packages/a5/d3/8650919bc3c7c6e90
 wheels = [
     { url = "https://files.pythonhosted.org/packages/ab/6e/81d47999aebc1b155f81eca4477a616a70f238a2549848c38983f3c22a82/ftfy-6.3.1-py3-none-any.whl", hash = "sha256:7c70eb532015cd2f9adb53f101fb6c7945988d023a085d127d1573dc49dd0083", size = 44821, upload-time = "2024-10-26T00:50:33.425Z" },
 ]
-
-[[package]]
-name = "gaze3d"
-version = "0.1.0"
-source = { editable = "gaze3d" }
 
 [[package]]
 name = "gdown"
