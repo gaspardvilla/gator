@@ -12,3 +12,8 @@ gaze3D/
 *.png
 *.jpeg
 *.mp4
+*.csv
+
+# Pycache
+__pycache__/
+*.pyc

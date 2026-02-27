@@ -29,7 +29,7 @@ dependencies = [
     "torchmetrics==1.2.1",
     "torchvision==0.16.1",
     "transformers==4.35.2",
-    "ultralytics>=8.4.9",
+    "ultralytics>=8,<9",
     "uvicorn>=0.40.0",
     "wandb==0.16.1",
 ]

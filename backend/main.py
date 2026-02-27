@@ -11,7 +11,7 @@ from gaze3d.demo import Gaze3DDemo
 
 if __name__ == "__main__":
     demo = Gaze3DDemo(
-        input_filename = "gaze3d/data/pexels-jopwell-2422290.jpg",
+        input_filename = "gaze3d/data/yolo.mp4",
         output_dir = "gaze3d/output",
         ckpt_path = "gaze3d/checkpoints/gat_stwsge_gaze360_gf.ckpt",
         inference_modality = "image",
