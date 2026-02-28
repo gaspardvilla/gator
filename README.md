@@ -15,5 +15,15 @@ After all requirements are well installed, run the following bash command:
 ./run_app.sh
 ```
 
-Download git repo
-Download model weights and checkpoints
+# Laaunch the backend server
+
+```uv run uvicorn server:app --host 0.0.0.0 --port 8000```
+
+
+
+# Available commands
+
+```
+http GET localhost:8000/health
+http GET localhost:8000/detect
+```
