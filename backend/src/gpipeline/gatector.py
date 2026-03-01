@@ -55,45 +55,34 @@ class Gatector():
         self._load_models()
 
 
-    @property
-    def progress_callback(self) -> Callable[[str], None] | None:
-        return self._progress_callback
-
-    @progress_callback.setter
-    def progress_callback(self, value: Callable[[str], None] | None) -> None:
-        self._progress_callback = value
-
-    def send_progress(self, name: str) -> None:
-        if self._progress_callback is not None:
-            self._progress_callback(name)
-
-
     def run(self, input_file_path: str,
             output_dir: str,
             modality: str = "image",
             progress_callback: Callable[[str], None] | None = None,) -> dict | None:
+        # Set the progress callback
         self.progress_callback = progress_callback
-        # 0. Load the input file
+        
+        # 1. Load the input file
         logger.info(f"Loading input file: {input_file_path}")
         if not self._load_input_file(input_file_path, output_dir, modality):
             message = f"Failed to load input file: {input_file_path}"
             logger.error(message)
             return self._create_response(success = False, message = message)
-        self.send_progress("input_loaded")
+        self._send_progress("input_loaded")
 
-        # 1. Detect and track heads
+        # 2. Detect and track heads
         logger.info(f"Detecting and tracking heads")
         self._detect_and_track_heads()
-        self.send_progress("heads_detected")
+        self._send_progress("heads_detected")
 
-        # 2. Predict gaze
+        # 3. Predict gaze
         logger.info(f"Predicting gaze")
         self._predict_gaze()
-        self.send_progress("gaze_predicted")
+        self._send_progress("gaze_predicted")
 
-        # 3. Draw the predicted gaze on the input video/image
+        # 4. Draw the predicted gaze on the input video/image
         logger.info(f"Drawing predicted gaze on the input file")
-        self.send_progress("drawing")
+        self._send_progress("drawing")
         self._draw_predicted_gaze()
         return None
 
@@ -365,3 +354,17 @@ class Gatector():
         return {"success": success,
                 "message": message,
                 "data": data}
+
+
+    def _send_progress(self, name: str) -> None:
+        if self._progress_callback is not None:
+            self._progress_callback(name)
+
+
+    @property
+    def progress_callback(self) -> Callable[[str], None] | None:
+        return self._progress_callback
+
+    @progress_callback.setter
+    def progress_callback(self, value: Callable[[str], None] | None) -> None:
+        self._progress_callback = value
