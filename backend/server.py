@@ -10,7 +10,7 @@ from typing import Any
 from contextlib import asynccontextmanager
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi import FastAPI, File, HTTPException, UploadFile
-from fastapi.responses import JSONResponse, StreamingResponse
+from fastapi.responses import FileResponse, JSONResponse, StreamingResponse
 
 from src.gapp import AppGatector
 from src.gdata.upload_utils import ALLOWED_EXTENSIONS, get_next_capture_dir
@@ -44,8 +44,11 @@ def run_pipeline_job(app_gatector: AppGatector,
         method = getattr(app_gatector, method_name)
         result = method(progress_callback=progress_callback, **method_kwargs)
         if result.get("success"):
-            job_queue.put({"checkpoint": "done", **result.get("data", {})})
+            data = result.get("data", {})
+            job_queue.put({"checkpoint": "done", **data})
             jobs[job_id]["status"] = "done"
+            jobs[job_id]["output_dir"] = data.get("output_dir")
+            jobs[job_id]["output_type"] = data.get("output_type", "image")
         else:
             err_msg = result.get("message") or result.get("data", {}).get("message", "Unknown error")
             job_queue.put({"checkpoint": "error", "message": err_msg})
@@ -84,7 +87,7 @@ async def health():
 async def upload(file: UploadFile = File(...)):
     # Check if the file is valid
     if not file.filename:
-        raise HTTPException(status_code=400, detail="Missing filename")
+        raise HTTPException(status_code = 400, detail = "Missing filename")
 
     # Check if the file extension is allowed
     ext = os.path.splitext(file.filename)[1].lower()
@@ -116,7 +119,6 @@ async def detect(body: dict | None = None):
                               args = (app_gatector, job_id, job_queue),
                               kwargs = {"method_name": "detect_sync",
                                         "method_kwargs": {"input_file_path": body["input_path"],
-                                                          "output_dir": body["output_dir"],
                                                           "modality": body["modality"]}},
                               daemon = True)
     thread.start()
@@ -169,3 +171,26 @@ async def job_stream(job_id: str):
                              headers = {"Cache-Control": "no-store",
                                         "Connection": "keep-alive",
                                         "X-Accel-Buffering": "no"})
+
+
+@app.get("/jobs/{job_id}/output")
+async def job_output(job_id: str):
+    """Serve the detection output file (video or image) for in-browser playback."""
+    if job_id not in jobs:
+        raise HTTPException(status_code=404, detail="Job not found")
+    job = jobs[job_id]
+    if job.get("status") != "done":
+        raise HTTPException(status_code=404, detail="Job not complete")
+    output_dir = job.get("output_dir")
+    output_type = job.get("output_type", "image")
+    if not output_dir or not os.path.isdir(output_dir):
+        raise HTTPException(status_code=404, detail="Output not found")
+    if output_type == "video":
+        path = os.path.join(output_dir, "predicted_gaze.mp4")
+        if not os.path.isfile(path):
+            raise HTTPException(status_code=404, detail="Output video not found")
+        return FileResponse(path, media_type="video/mp4")
+    path = os.path.join(output_dir, "predicted_gaze.png")
+    if not os.path.isfile(path):
+        raise HTTPException(status_code=404, detail="Output image not found")
+    return FileResponse(path, media_type="image/png")

@@ -8,10 +8,17 @@ export const fontSizes = {
   base: "16px",
   lg: "18px",
   xl: "30px",
+  /** Page title (one per page) */
+  title: "60px",
+  /** Subtitle / tagline under title */
+  subtitle: "18px",
 } as const;
 
-/** Border radius; uses CSS variable from globals.css */
-export const radius = "var(--radius)";
+/** Border radius: outer for cards/panels, inner for controls and nested elements */
+export const radius = {
+  outer: "12px",
+  inner: "6px",
+} as const;
 
 export const borderWidth = {
   thin: "1px",

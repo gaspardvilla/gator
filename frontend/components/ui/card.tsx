@@ -11,7 +11,12 @@ function Card({ className, style, ...props }: React.ComponentProps<"div">) {
         "bg-card text-card-foreground flex flex-col border shadow-sm",
         className
       )}
-      style={{ gap: spacing[6], borderRadius: radius, paddingTop: spacing[6], paddingBottom: spacing[6], ...style }}
+      style={{ 
+        gap: spacing[6], 
+        borderRadius: radius.outer, 
+        paddingTop: spacing[6], 
+        paddingBottom: spacing[6], 
+        ...style }}
       {...props}
     />
   )

@@ -45,7 +45,7 @@ function SelectTrigger({
       )}
       style={{ 
         gap: spacing[2], 
-        borderRadius: radius, 
+        borderRadius: radius.inner, 
         paddingLeft: spacing[3], 
         paddingRight: spacing[2], 
         paddingTop: spacing[2], 
@@ -81,7 +81,7 @@ function SelectContent({
             "data-[side=bottom]:translate-y-1 data-[side=left]:-translate-x-1 data-[side=right]:translate-x-1 data-[side=top]:-translate-y-1",
           className
         )}
-        style={{ borderRadius: radius, ...style }}
+        style={{ borderRadius: radius.inner, ...style }}
         position={position}
         align={align}
         {...props}

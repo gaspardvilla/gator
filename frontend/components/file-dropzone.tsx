@@ -24,6 +24,7 @@ export type FileDropzoneProps = {
   file: File | null;
   disabled?: boolean;
   className?: string;
+  style?: React.CSSProperties;
   footer?: React.ReactNode;
 };
 
@@ -32,6 +33,7 @@ export function FileDropzone({
   file,
   disabled = false,
   className,
+  style,
   footer,
 }: FileDropzoneProps) {
   const onDrop = useCallback(
@@ -58,18 +60,26 @@ export function FileDropzone({
         display: "flex",
         flexDirection: "column",
         gap: spacing[4],
-        padding: spacing[4],
+        paddingLeft: spacing[6],
+        paddingRight: spacing[6],
+        paddingTop: spacing[6],
+        paddingBottom: spacing[6],
+        ...style,
       }}
     >
       <Card
         {...getRootProps()}
         className="focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
         style={{
+          flex: 1,
+          minHeight: 0,
+          display: "flex",
+          flexDirection: "column",
           backgroundColor: isDragActive ? "color-mix(in oklch, var(--muted) 50%, transparent)" : "transparent",
           borderWidth: borderWidth.thin,
           borderStyle: file ? "solid" : "dashed",
           borderColor: "var(--muted-foreground)",
-          borderRadius: radius,
+          borderRadius: radius.inner,
           cursor: disabled ? "not-allowed" : "pointer",
           opacity: disabled ? 0.6 : 1,
           outline: "none",
@@ -114,6 +124,8 @@ export function FileDropzone({
             flexDirection: "column",
             gap: spacing[4],
             paddingTop: 0,
+            paddingLeft: 0,
+            paddingRight: 0,
           }}
         >
           {footer}

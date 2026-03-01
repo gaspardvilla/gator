@@ -31,7 +31,15 @@ function Alert({
       data-slot="alert"
       role="alert"
       className={cn(alertVariants({ variant }), className)}
-      style={{ borderRadius: radius, paddingLeft: spacing[4], paddingRight: spacing[4], paddingTop: spacing[3], paddingBottom: spacing[3], fontSize: fontSizes.sm, gap: spacing[0.5], ...style }}
+      style={{ 
+        borderRadius: radius.outer, 
+        paddingLeft: spacing[4], 
+        paddingRight: spacing[4], 
+        paddingTop: spacing[3], 
+        paddingBottom: spacing[3], 
+        fontSize: fontSizes.sm, 
+        gap: spacing[0.5], 
+        ...style }}
       {...props}
     />
   )

@@ -48,10 +48,10 @@
 
 :root {
   --radius: 12px;
-  --background:  #ffffff;
-  --foreground:  #252525;
-  --card:  #ffffff;
-  --card-foreground:  #252525;
+  --background:  rgb(6, 10, 28);
+  --foreground:  #ffffff;
+  --card:  #0d1428;
+  --card-foreground:  rgb(249, 222, 116);
   --popover:  #ffffff;
   --popover-foreground:  #252525;
   --primary:  #353535;

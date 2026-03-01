@@ -5,10 +5,13 @@ import { streamUrl } from "@/lib/backend";
 
 export type StreamStatus = "idle" | "running" | "done" | "error";
 
+export type OutputType = "video" | "image";
+
 export type DetectStreamState = {
   checkpoints: string[];
   status: StreamStatus;
   outputDir?: string;
+  outputType?: OutputType;
   errorMessage?: string;
   isConnected: boolean;
 };
@@ -28,6 +31,7 @@ export function useDetectStream(jobId: string | null): DetectStreamState {
   const [checkpoints, setCheckpoints] = useState<string[]>([]);
   const [status, setStatus] = useState<StreamStatus>("idle");
   const [outputDir, setOutputDir] = useState<string | undefined>();
+  const [outputType, setOutputType] = useState<OutputType | undefined>();
   const [errorMessage, setErrorMessage] = useState<string | undefined>();
   const [isConnected, setIsConnected] = useState(false);
   const statusRef = useRef(status);
@@ -38,6 +42,7 @@ export function useDetectStream(jobId: string | null): DetectStreamState {
       setCheckpoints([]);
       setStatus("idle");
       setOutputDir(undefined);
+      setOutputType(undefined);
       setErrorMessage(undefined);
       setIsConnected(false);
       return;
@@ -46,6 +51,7 @@ export function useDetectStream(jobId: string | null): DetectStreamState {
     setStatus("running");
     setCheckpoints([]);
     setOutputDir(undefined);
+    setOutputType(undefined);
     setErrorMessage(undefined);
 
     const url = streamUrl(jobId);
@@ -67,6 +73,7 @@ export function useDetectStream(jobId: string | null): DetectStreamState {
       if (checkpoint === "done") {
         setStatus("done");
         if (typeof data.output_dir === "string") setOutputDir(data.output_dir);
+        if (data.output_type === "video" || data.output_type === "image") setOutputType(data.output_type);
         eventSource.close();
         setIsConnected(false);
       } else if (checkpoint === "error") {
@@ -92,5 +99,5 @@ export function useDetectStream(jobId: string | null): DetectStreamState {
     };
   }, [jobId]);
 
-  return { checkpoints, status, outputDir, errorMessage, isConnected };
+  return { checkpoints, status, outputDir, outputType, errorMessage, isConnected };
 }

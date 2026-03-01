@@ -69,11 +69,11 @@ class Gatector():
 
 
     def run(self, input_file_path: str,
-            output_dir: str,
             modality: str = "image",
             progress_callback: Callable[[str], None] | None = None,) -> dict:
         # Set the progress callback
         self.progress_callback = progress_callback
+        output_dir = os.path.dirname(input_file_path)
 
         # 1. Load the input file
         logger.info(f"Loading input file: {input_file_path}")
@@ -99,9 +99,11 @@ class Gatector():
         self._draw_predicted_gaze()
         message = f"Prediction completed successfully"
         logger.info(message)
-        return self._create_response(success = True, 
-                                     message = message, 
-                                     data = {"output_dir": self.output_dir})
+        data = {"output_dir": self.output_dir, 
+                "output_type": "video" if self.file_modality == "video" else "image"}
+        return self._create_response(success = True,
+                                     message = message,
+                                     data = data)
 
 
     def _draw_predicted_gaze(self):

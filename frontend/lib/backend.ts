@@ -51,6 +51,10 @@ export function streamUrl(jobId: string): string {
   return `${API_BASE}/jobs/${jobId}/stream`;
 }
 
+export function outputUrl(jobId: string): string {
+  return `${API_BASE}/jobs/${jobId}/output`;
+}
+
 export type LoadModelsResponse = { job_id: string };
 
 export type LoadModelsBody = { device: string; gaze_training_mode: string };

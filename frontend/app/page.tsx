@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
-import { healthCheck, loadModels, startDetect, uploadFile } from "@/lib/backend";
+import { healthCheck, loadModels, startDetect, uploadFile, outputUrl } from "@/lib/backend";
 import { useDetectStream } from "@/hooks/useDetectStream";
 import { Button } from "@/components/ui/button";
 import {
@@ -25,7 +25,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { FileDropzone } from "@/components/file-dropzone";
-import { containerMaxWidth, fontSizes, spacing } from "@/lib/sizes";
+import { containerMaxWidth, fontSizes, radius, spacing } from "@/lib/sizes";
 import { toast } from "sonner";
 
 const DEVICE_OPTIONS = [
@@ -127,41 +127,48 @@ export default function Home() {
   return (
     <div
       style={{
-        minHeight: "100vh",
+        height: "100vh",
+        overflow: "hidden",
+        display: "flex",
+        flexDirection: "column",
         padding: spacing[6],
       }}
     >
       <header
         style={{
-          margin: `0 auto ${spacing[8]}`,
+          flexShrink: 0,
+          margin: "0 auto",
+          marginBottom: spacing[6],
           maxWidth: containerMaxWidth,
+          width: "100%",
           textAlign: "center",
         }}
       >
         <h1
-        style={{
-          fontSize: fontSizes.xl,
-          fontWeight: 600,
-          letterSpacing: "-0.025em",
-          lineHeight: 1.2,
-        }}
+          style={{
+            fontSize: fontSizes.title,
+            fontWeight: 600,
+            lineHeight: 1.2,
+          }}
         >
           Gatector
         </h1>
         <p
-        style={{
-          marginTop: spacing[2],
-          color: "var(--muted-foreground)",
-          fontSize: fontSizes.sm,
-        }}
+          style={{
+            marginTop: spacing[2],
+            color: "var(--muted-foreground)",
+            fontSize: fontSizes.subtitle,
+          }}
         >
           Extract 3D gaze from video or images. Upload a file, run detection, and view the result.
         </p>
       </header>
 
       <main
-        className="grid-cols-1 md:grid-cols-[1fr_1.2fr]"
+        className="grid-cols-1 md:grid-cols-[1fr_1.5fr]"
         style={{
+          flex: 1,
+          minHeight: 0,
           margin: "0 auto",
           display: "grid",
           width: "100%",
@@ -170,13 +177,15 @@ export default function Home() {
         }}
       >
         <section
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          gap: spacing[4],
-        }}
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            gap: spacing[6],
+            minHeight: 0,
+            overflow: "auto",
+          }}
         >
-          <Card>
+          <Card style={{ flexShrink: 0 }}>
             <CardHeader>
               <CardTitle
                 style={{
@@ -273,6 +282,7 @@ export default function Home() {
             file={selectedFile}
             onFileSelected={setSelectedFile}
             disabled={isRunning}
+            style={{ flex: 1, minHeight: 0 }}
             footer={
               <>
                 <Button
@@ -287,8 +297,8 @@ export default function Home() {
           />
         </section>
 
-        <section>
-          <Card style={{ minHeight: "320px" }}>
+        <section style={{ minHeight: 0, display: "flex", flexDirection: "column" }}>
+          <Card style={{ flex: 1, minHeight: 0, display: "flex", flexDirection: "column" }}>
             <CardHeader>
               <CardTitle style={{ fontSize: fontSizes.base, fontWeight: 600 }}>
                 Output
@@ -299,18 +309,47 @@ export default function Home() {
                   color: "var(--muted-foreground)",
                 }}
               >
-                Result will appear here after detection
+                {stream.status === "done" && stream.outputType
+                  ? "Play or view the result below"
+                  : "Result will appear here after detection"}
               </CardDescription>
             </CardHeader>
-            <CardContent>
-              <p
-                style={{
-                  fontSize: fontSizes.sm,
-                  color: "var(--muted-foreground)",
-                }}
-              >
-                Output video or image will be shown here.
-              </p>
+            <CardContent style={{ flex: 1, minHeight: 0, overflow: "auto" }}>
+              {stream.status === "done" && jobId && stream.outputType ? (
+                <div
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    width: "100%",
+                    maxWidth: "100%",
+                  }}
+                >
+                  {stream.outputType === "video" ? (
+                    <video
+                      src={outputUrl(jobId)}
+                      controls
+                      playsInline
+                      style={{ maxWidth: "100%", height: "auto", borderRadius: radius.outer }}
+                    />
+                  ) : (
+                    <img
+                      src={outputUrl(jobId)}
+                      alt="Detection result"
+                      style={{ maxWidth: "100%", height: "auto", borderRadius: radius.outer }}
+                    />
+                  )}
+                </div>
+              ) : (
+                <p
+                  style={{
+                    fontSize: fontSizes.sm,
+                    color: "var(--muted-foreground)",
+                  }}
+                >
+                  Output video or image will be shown here after detection completes.
+                </p>
+              )}
             </CardContent>
           </Card>
         </section>
