@@ -11,6 +11,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { fontSizes, radius, spacing, borderWidth } from "@/lib/sizes";
 import { CheckIcon, UploadIcon } from "lucide-react";
 
 const ACCEPT = {
@@ -56,8 +57,8 @@ export function FileDropzone({
       style={{
         display: "flex",
         flexDirection: "column",
-        gap: "1rem",
-        padding: "1rem",
+        gap: spacing[4],
+        padding: spacing[4],
       }}
     >
       <Card
@@ -65,10 +66,10 @@ export function FileDropzone({
         className="focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
         style={{
           backgroundColor: isDragActive ? "color-mix(in oklch, var(--muted) 50%, transparent)" : "transparent",
-          borderWidth: "1px",
+          borderWidth: borderWidth.thin,
           borderStyle: file ? "solid" : "dashed",
           borderColor: "var(--muted-foreground)",
-          borderRadius: "var(--radius)",
+          borderRadius: radius,
           cursor: disabled ? "not-allowed" : "pointer",
           opacity: disabled ? 0.6 : 1,
           outline: "none",
@@ -82,8 +83,8 @@ export function FileDropzone({
               display: "inline-flex",
               alignItems: "center",
               justifyContent: "center",
-              gap: "0.5rem",
-              fontSize: "1rem",
+              gap: spacing[2],
+              fontSize: fontSizes.base,
               lineHeight: "1",
               fontWeight: 600,
             }}
@@ -95,7 +96,7 @@ export function FileDropzone({
             style={{
               display: "inline-flex",
               alignItems: "center",
-              fontSize: "0.875rem",
+              fontSize: fontSizes.sm,
               justifyContent: "center",
               color: "var(--muted-foreground)",
             }}
@@ -111,7 +112,7 @@ export function FileDropzone({
           style={{
             display: "flex",
             flexDirection: "column",
-            gap: "1rem",
+            gap: spacing[4],
             paddingTop: 0,
           }}
         >

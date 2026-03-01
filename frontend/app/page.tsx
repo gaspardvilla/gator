@@ -25,14 +25,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { FileDropzone } from "@/components/file-dropzone";
+import { containerMaxWidth, fontSizes, spacing } from "@/lib/sizes";
 import { toast } from "sonner";
-
-const CHECKPOINT_LABELS: Record<string, string> = {
-  input_loaded: "Input loaded",
-  heads_detected: "Heads detected & tracked",
-  gaze_predicted: "Gaze predicted",
-  drawing: "Drawing gaze on output",
-};
 
 const DEVICE_OPTIONS = [
   { value: "cpu", label: "CPU", description: "Run on CPU" },
@@ -113,8 +107,7 @@ export default function Home() {
     if (stream.status === "running") {
       const label =
         stream.checkpoints.length > 0
-          ? CHECKPOINT_LABELS[stream.checkpoints[stream.checkpoints.length - 1]] ??
-            stream.checkpoints[stream.checkpoints.length - 1]
+          ? stream.checkpoints[stream.checkpoints.length - 1]
           : "Running…";
       toast.loading(label, { id: DETECT_TOAST_ID });
     } else if (stream.status === "done") {
@@ -135,32 +128,32 @@ export default function Home() {
     <div
       style={{
         minHeight: "100vh",
-        padding: "1.5rem",
+        padding: spacing[6],
       }}
     >
       <header
         style={{
-          margin: "0 auto 2rem",
-          maxWidth: "56rem",
+          margin: `0 auto ${spacing[8]}`,
+          maxWidth: containerMaxWidth,
           textAlign: "center",
         }}
       >
         <h1
-          style={{
-            fontSize: "1.875rem",
-            fontWeight: 600,
-            letterSpacing: "-0.025em",
-            lineHeight: 1.2,
-          }}
+        style={{
+          fontSize: fontSizes.xl,
+          fontWeight: 600,
+          letterSpacing: "-0.025em",
+          lineHeight: 1.2,
+        }}
         >
           Gatector
         </h1>
         <p
-          style={{
-            marginTop: "0.5rem",
-            color: "var(--muted-foreground)",
-            fontSize: "0.875rem",
-          }}
+        style={{
+          marginTop: spacing[2],
+          color: "var(--muted-foreground)",
+          fontSize: fontSizes.sm,
+        }}
         >
           Extract 3D gaze from video or images. Upload a file, run detection, and view the result.
         </p>
@@ -172,22 +165,22 @@ export default function Home() {
           margin: "0 auto",
           display: "grid",
           width: "100%",
-          maxWidth: "56rem",
-          gap: "1.5rem",
+          maxWidth: containerMaxWidth,
+          gap: spacing[6],
         }}
       >
         <section
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            gap: "1rem",
-          }}
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          gap: spacing[4],
+        }}
         >
           <Card>
             <CardHeader>
               <CardTitle
                 style={{
-                  fontSize: "1.125rem",
+                  fontSize: fontSizes.lg,
                   fontWeight: 700,
                   textAlign: "center",
                 }}
@@ -195,7 +188,7 @@ export default function Home() {
                 Model settings
               </CardTitle>
             </CardHeader>
-            <CardContent style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+            <CardContent style={{ display: "flex", flexDirection: "column", gap: spacing[4] }}>
               <Field orientation="vertical">
                 <FieldLabel>Device</FieldLabel>
                 <Select value={device} onValueChange={setDevice}>
@@ -211,13 +204,13 @@ export default function Home() {
                           style={{
                             display: "flex",
                             flexDirection: "column",
-                            gap: "0.125rem",
+                            gap: spacing[0.5],
                           }}
                         >
                           <span style={{ fontWeight: 500 }}>{opt.label}</span>
                           <span
                             style={{
-                              fontSize: "0.75rem",
+                              fontSize: fontSizes.xs,
                               color: "var(--muted-foreground)",
                             }}
                           >
@@ -244,13 +237,13 @@ export default function Home() {
                           style={{
                             display: "flex",
                             flexDirection: "column",
-                            gap: "0.125rem",
+                            gap: spacing[0.5],
                           }}
                         >
                           <span style={{ fontWeight: 500 }}>{opt.label}</span>
                           <span
                             style={{
-                              fontSize: "0.75rem",
+                              fontSize: fontSizes.xs,
                               color: "var(--muted-foreground)",
                             }}
                           >
@@ -297,12 +290,12 @@ export default function Home() {
         <section>
           <Card style={{ minHeight: "320px" }}>
             <CardHeader>
-              <CardTitle style={{ fontSize: "1rem", fontWeight: 600 }}>
+              <CardTitle style={{ fontSize: fontSizes.base, fontWeight: 600 }}>
                 Output
               </CardTitle>
               <CardDescription
                 style={{
-                  fontSize: "0.875rem",
+                  fontSize: fontSizes.sm,
                   color: "var(--muted-foreground)",
                 }}
               >
@@ -312,7 +305,7 @@ export default function Home() {
             <CardContent>
               <p
                 style={{
-                  fontSize: "0.875rem",
+                  fontSize: fontSizes.sm,
                   color: "var(--muted-foreground)",
                 }}
               >
