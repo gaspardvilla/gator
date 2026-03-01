@@ -51,7 +51,9 @@ class Gatector():
         self.gaze_training_mode = gaze_training_mode
         self._progress_callback = None
 
-        # Pre-load all the models
+
+    def initialize(self, progress_callback: Callable[[str], None] | None = None):
+        self.progress_callback = progress_callback
         self._load_models()
 
 
@@ -61,7 +63,7 @@ class Gatector():
             progress_callback: Callable[[str], None] | None = None,) -> dict | None:
         # Set the progress callback
         self.progress_callback = progress_callback
-        
+
         # 1. Load the input file
         logger.info(f"Loading input file: {input_file_path}")
         if not self._load_input_file(input_file_path, output_dir, modality):
@@ -303,13 +305,16 @@ class Gatector():
 
 
     def _load_models(self):
+        self._send_progress("loading_models")
         self._load_gaze_model()
         self._load_head_detection_model()
         self._load_tracker()
+        self._send_progress("models_loaded")
 
 
     def _load_head_detection_model(self) -> None:
         """Load the pre-trained head detection model"""
+        self._send_progress("loading_head_detection_model")
         model = torch.hub.load("ultralytics/yolov5", 
                                "custom", 
                                path = ckpts_paths["HeadDetection"], 
@@ -321,10 +326,11 @@ class Gatector():
         model = model.to(self.device)
         model.eval()
         self.head_detection_model = model
-
+        self._send_progress("head_detection_model_loaded")
     
     def _load_gaze_model(self) -> None:
         """Load the pre-trained Gaze-At-Target model"""
+        self._send_progress("loading_gaze_model")
         model = GaT(encoder = Swin3D(pretrained=False),
                     head_dict = HeadDict(names = ["gaze"],
                                          modules = [partial(MLPHead,
@@ -337,11 +343,14 @@ class Gatector():
         model.to(self.device)
         model.eval()
         self.gaze_model = model
+        self._send_progress("gaze_model_loaded")
 
 
     def _load_tracker(self) -> None:
         """Load the pre-trained tracker"""
+        self._send_progress("loading_tracker")
         self.tracker = OCSORT()
+        self._send_progress("tracker_loaded")
 
 
     def _create_response(self, success: bool, 

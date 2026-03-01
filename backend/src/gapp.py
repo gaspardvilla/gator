@@ -1,5 +1,8 @@
+import logging
 from typing import Callable
 from src.gpipeline.gatector import Gatector
+
+logger = logging.getLogger(__name__)
 
 
 class AppGatector:
@@ -9,6 +12,11 @@ class AppGatector:
                                  num_workers = 4,
                                  window_stride = 1,
                                  gaze_training_mode = "GazeFollow360")
+
+
+    def initialize(self):
+        self.gatector.initialize()
+    
 
     def detect_sync(self, input_file_path: str,
                     output_dir: str,

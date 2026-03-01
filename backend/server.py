@@ -31,7 +31,26 @@ MODALITY = "image"
 jobs: dict[str, dict] = {}
 
 
-def run_pipeline(app_gatector: AppGatector, job_id: str, job_queue: queue.Queue) -> None:
+def initialize_pipeline(app_gatector: AppGatector, job_id: str, job_queue: queue.Queue) -> None:
+    # Callback function to send progress updates to the client
+    def progress_callback(checkpoint: str) -> None:
+        job_queue.put({"checkpoint": checkpoint})
+
+    # Initialize the pipeline
+    try:
+        result = app_gatector.initialize(progress_callback = progress_callback)
+        if result is not None:
+            job_queue.put({"checkpoint": "error", "message": result.get("message", "Unknown error")})
+            jobs[job_id]["status"] = "error"
+        else:
+            job_queue.put({"checkpoint": "done"})
+            jobs[job_id]["status"] = "done"
+    except Exception as e:
+        job_queue.put({"checkpoint": "error", "message": str(e)})
+        jobs[job_id]["status"] = "error"
+
+
+def detect_pipeline(app_gatector: AppGatector, job_id: str, job_queue: queue.Queue) -> None:
     # Callback function to send progress updates to the client
     def progress_callback(checkpoint: str) -> None:
         job_queue.put({"checkpoint": checkpoint})
@@ -113,11 +132,27 @@ async def detect():
     job_id = uuid.uuid4().hex
     job_queue: queue.Queue = queue.Queue()
     jobs[job_id] = {"queue": job_queue, "status": "running"}
-    thread = threading.Thread(target = run_pipeline,
+    thread = threading.Thread(target = detect_pipeline,
                               args = (app_gatector, job_id, job_queue),
                               daemon = True)
     thread.start()
     return JSONResponse(content = {"job_id": job_id}, status_code = 201)
+
+
+@app.post("/initialize")
+async def initialize():
+    app_gatector = getattr(app.state, "app_gatector", None)
+    if app_gatector is None:
+        return JSONResponse(content = {"status": "error", "message": "AppGatector not initialized"},
+                            status_code = 503)
+    job_id = uuid.uuid4().hex
+    job_queue: queue.Queue = queue.Queue()
+    jobs[job_id] = {"queue": job_queue, "status": "running"}
+    thread = threading.Thread(target = initialize_pipeline,
+                              args = (app_gatector, job_id, job_queue),
+                              daemon = True)
+    thread.start()
+    return JSONResponse(content = {"status": "ok"}, status_code = 200)
 
 
 @app.get("/jobs/{job_id}/stream")
