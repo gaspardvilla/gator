@@ -320,16 +320,16 @@ class Gatector():
 
 
     def _load_models(self):
-        self._send_progress("loading_models")
+        self._send_progress("Loading models...")
         self._load_gaze_model()
         self._load_head_detection_model()
         self._load_tracker()
-        self._send_progress("models_loaded")
+        self._send_progress("Models loaded")
 
 
     def _load_head_detection_model(self) -> None:
         """Load the pre-trained head detection model"""
-        self._send_progress("loading_head_detection_model")
+        self._send_progress("Loading head detection model...")
         model = torch.hub.load("ultralytics/yolov5", 
                                "custom", 
                                path = ckpts_paths["HeadDetection"], 
@@ -341,11 +341,10 @@ class Gatector():
         model = model.to(self.device)
         model.eval()
         self.head_detection_model = model
-        self._send_progress("head_detection_model_loaded")
     
     def _load_gaze_model(self) -> None:
         """Load the pre-trained Gaze-At-Target model"""
-        self._send_progress("loading_gaze_model")
+        self._send_progress("Loading gaze model...")
         model = GaT(encoder = Swin3D(pretrained=False),
                     head_dict = HeadDict(names = ["gaze"],
                                          modules = [partial(MLPHead,
@@ -358,14 +357,12 @@ class Gatector():
         model.to(self.device)
         model.eval()
         self.gaze_model = model
-        self._send_progress("gaze_model_loaded")
 
 
     def _load_tracker(self) -> None:
         """Load the pre-trained tracker"""
-        self._send_progress("loading_tracker")
+        self._send_progress("Loading tracker...")
         self.tracker = OCSORT()
-        self._send_progress("tracker_loaded")
 
 
     def _create_response(self, success: bool, 

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { healthCheck, loadModels, startDetect } from "@/lib/backend";
 import { useDetectStream } from "@/hooks/useDetectStream";
@@ -83,16 +83,29 @@ export default function Home() {
 
   const detectMutation = useMutation({
     mutationFn: startDetect,
-    onSuccess: (data) => {
-      setJobId(data.job_id);
-      toast.success("Detection started");
-    },
+    onSuccess: (data) => setJobId(data.job_id),
     onError: (err) => {
       toast.error(err instanceof Error ? err.message : "Failed to start detection");
     },
   });
 
   const stream = useDetectStream(jobId);
+
+  const DETECT_TOAST_ID = "detect-progress";
+  useEffect(() => {
+    if (stream.status === "running") {
+      const label =
+        stream.checkpoints.length > 0
+          ? CHECKPOINT_LABELS[stream.checkpoints[stream.checkpoints.length - 1]] ??
+            stream.checkpoints[stream.checkpoints.length - 1]
+          : "Running…";
+      toast.loading(label, { id: DETECT_TOAST_ID });
+    } else if (stream.status === "done") {
+      toast.success("Detection completed", { id: DETECT_TOAST_ID });
+    } else if (stream.status === "error" && stream.errorMessage) {
+      toast.error(stream.errorMessage, { id: DETECT_TOAST_ID });
+    }
+  }, [stream.status, stream.checkpoints, stream.errorMessage]);
 
   const isLoadModelsRunning =
     loadModelsStream.status === "running" ||
