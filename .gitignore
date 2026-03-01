@@ -17,3 +17,6 @@ gaze3D/
 # Pycache
 __pycache__/
 *.pyc
+
+# Unitests
+unitest/

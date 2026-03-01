@@ -1,3 +1,4 @@
+import os
 import sys
 import json
 import uuid
@@ -6,11 +7,12 @@ import logging
 import asyncio
 import threading
 from contextlib import asynccontextmanager
-from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi import FastAPI, File, HTTPException, UploadFile
 from fastapi.responses import JSONResponse, StreamingResponse
 
 from src.gapp import AppGatector
+from src.gdata.upload_utils import ALLOWED_EXTENSIONS, get_next_capture_dir
 
 # Configure logging so gatector (and other src) logs appear in the terminal
 logging.basicConfig(
@@ -77,6 +79,29 @@ async def health():
             content = {"status": "error", "message": "AppGatector not initialized"},
             status_code = 503,)
     return {"status": "ok", "gatector": "ready"}
+
+
+@app.post("/upload")
+async def upload(file: UploadFile = File(...)):
+    # Check if the file is valid
+    if not file.filename:
+        raise HTTPException(status_code=400, detail="Missing filename")
+
+    # Check if the file extension is allowed
+    ext = os.path.splitext(file.filename)[1].lower()
+    if ext not in ALLOWED_EXTENSIONS:
+        raise HTTPException(
+            status_code = 400,
+            detail = f"Format not allowed. Only {', '.join(sorted(ALLOWED_EXTENSIONS))} are accepted.",)
+    
+    # Get the next capture directory and save the file
+    dir_path = get_next_capture_dir()
+    os.makedirs(dir_path, exist_ok=True)
+    file_path = os.path.join(dir_path, f"input{ext}")
+    with open(file_path, "wb") as f:
+        while chunk := await file.read(8192):
+            f.write(chunk)
+    return {"path": file_path}
 
 
 @app.post("/detect")
