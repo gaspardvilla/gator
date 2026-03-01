@@ -13,6 +13,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { FileDropzone } from "@/components/file-dropzone";
 import { toast } from "sonner";
 
 const CHECKPOINT_LABELS: Record<string, string> = {
@@ -24,6 +25,7 @@ const CHECKPOINT_LABELS: Record<string, string> = {
 
 export default function Home() {
   const [jobId, setJobId] = useState<string | null>(null);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
   const { isSuccess: isHealthy, isLoading: healthLoading } = useQuery({
     queryKey: ["health"],
@@ -52,6 +54,11 @@ export default function Home() {
   return (
     <div className="flex min-h-screen items-center justify-center p-6">
       <main className="w-full max-w-lg space-y-6">
+        <FileDropzone
+          file={selectedFile}
+          onFileSelected={setSelectedFile}
+          disabled={isRunning}
+        />
         <Card>
           <CardHeader>
             <CardTitle>Gatector</CardTitle>
