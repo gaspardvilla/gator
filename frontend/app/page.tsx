@@ -12,6 +12,18 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import {
+  Field,
+  FieldDescription,
+  FieldLabel,
+} from "@/components/ui/field";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { FileDropzone } from "@/components/file-dropzone";
 import { toast } from "sonner";
@@ -23,9 +35,30 @@ const CHECKPOINT_LABELS: Record<string, string> = {
   drawing: "Drawing gaze on output",
 };
 
+const DEVICE_OPTIONS = [
+  { value: "cpu", label: "CPU", description: "Run on CPU" },
+  { value: "cuda", label: "GPU (cuda)", description: "Run on NVIDIA GPU via CUDA" },
+  { value: "mps", label: "GPU (mps)", description: "Run on Apple Silicon GPU via MPS" },
+] as const;
+
+const GAZE_MODE_OPTIONS = [
+  {
+    value: "GazeFollow360",
+    label: "GazeFollow360",
+    description: "Best SOTA model trained on Gaze360 and GazeFollow",
+  },
+  {
+    value: "Gaze360",
+    label: "Gaze360",
+    description: "Best model trained on Gaze360 only",
+  },
+] as const;
+
 export default function Home() {
   const [jobId, setJobId] = useState<string | null>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [device, setDevice] = useState<string>("cpu");
+  const [gazeMode, setGazeMode] = useState<string>("GazeFollow360");
 
   const { isSuccess: isHealthy, isLoading: healthLoading } = useQuery({
     queryKey: ["health"],
@@ -62,6 +95,58 @@ export default function Home() {
 
       <main className="mx-auto grid w-full max-w-4xl grid-cols-1 gap-6 md:grid-cols-[1fr_1.2fr]">
         <section className="flex flex-col gap-4">
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-lg font-bold text-center">Model settings</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <Field orientation="vertical">
+                <FieldLabel>Device</FieldLabel>
+                <Select value={device} onValueChange={setDevice}>
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Choose device">
+                      {DEVICE_OPTIONS.find((o) => o.value === device)?.label}
+                    </SelectValue>
+                  </SelectTrigger>
+                  <SelectContent>
+                    {DEVICE_OPTIONS.map((opt) => (
+                      <SelectItem key={opt.value} value={opt.value}>
+                        <div className="flex flex-col gap-0.5">
+                          <span className="font-medium">{opt.label}</span>
+                          <span className="text-xs text-muted-foreground">
+                            {opt.description}
+                          </span>
+                        </div>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </Field>
+              <Field orientation="vertical">
+                <FieldLabel>Gaze model training mode</FieldLabel>
+                <Select value={gazeMode} onValueChange={setGazeMode}>
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Choose gaze model">
+                      {GAZE_MODE_OPTIONS.find((o) => o.value === gazeMode)?.label}
+                    </SelectValue>
+                  </SelectTrigger>
+                  <SelectContent>
+                    {GAZE_MODE_OPTIONS.map((opt) => (
+                      <SelectItem key={opt.value} value={opt.value}>
+                        <div className="flex flex-col gap-0.5">
+                          <span className="font-medium">{opt.label}</span>
+                          <span className="text-xs text-muted-foreground">
+                            {opt.description}
+                          </span>
+                        </div>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </Field>
+              <Button className="w-full">Load models</Button>
+            </CardContent>
+          </Card>
           <FileDropzone
             file={selectedFile}
             onFileSelected={setSelectedFile}
