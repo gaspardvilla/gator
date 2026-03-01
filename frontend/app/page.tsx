@@ -24,7 +24,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { FileDropzone } from "@/components/file-dropzone";
 import { toast } from "sonner";
 
@@ -70,10 +69,7 @@ export default function Home() {
 
   const loadModelsMutation = useMutation({
     mutationFn: (body: { device: string; gaze_training_mode: string }) => loadModels(body),
-    onSuccess: (data) => {
-      setLoadModelsJobId(data.job_id);
-      toast.success("Loading models…");
-    },
+    onSuccess: (data) => setLoadModelsJobId(data.job_id),
     onError: (err) => {
       toast.error(err instanceof Error ? err.message : "Failed to start load models");
     },
@@ -90,6 +86,21 @@ export default function Home() {
   });
 
   const stream = useDetectStream(jobId);
+
+  const LOAD_MODELS_TOAST_ID = "load-models-progress";
+  useEffect(() => {
+    if (loadModelsStream.status === "running") {
+      const label =
+        loadModelsStream.checkpoints.length > 0
+          ? loadModelsStream.checkpoints[loadModelsStream.checkpoints.length - 1]
+          : "Loading models…";
+      toast.loading(label, { id: LOAD_MODELS_TOAST_ID });
+    } else if (loadModelsStream.status === "done") {
+      toast.success("Models loaded", { id: LOAD_MODELS_TOAST_ID });
+    } else if (loadModelsStream.status === "error" && loadModelsStream.errorMessage) {
+      toast.error(loadModelsStream.errorMessage, { id: LOAD_MODELS_TOAST_ID });
+    }
+  }, [loadModelsStream.status, loadModelsStream.checkpoints, loadModelsStream.errorMessage]);
 
   const DETECT_TOAST_ID = "detect-progress";
   useEffect(() => {
@@ -272,49 +283,6 @@ export default function Home() {
                 >
                   {isRunning ? "Running…" : "Run detection"}
                 </Button>
-                {stream.checkpoints.length > 0 && (
-                  <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
-                    <p
-                      style={{
-                        fontSize: "0.875rem",
-                        fontWeight: 500,
-                      }}
-                    >
-                      Progress
-                    </p>
-                    <ul
-                      style={{
-                        listStylePosition: "inside",
-                        listStyleType: "disc",
-                        display: "flex",
-                        flexDirection: "column",
-                        gap: "0.25rem",
-                        fontSize: "0.875rem",
-                        color: "var(--muted-foreground)",
-                      }}
-                    >
-                      {stream.checkpoints.map((cp, i) => (
-                        <li key={`${cp}-${i}`}>
-                          {CHECKPOINT_LABELS[cp] ?? cp}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-                {stream.status === "done" && stream.outputDir && (
-                  <Alert>
-                    <AlertTitle>Done</AlertTitle>
-                    <AlertDescription>
-                      Output saved to {stream.outputDir}
-                    </AlertDescription>
-                  </Alert>
-                )}
-                {stream.status === "error" && stream.errorMessage && (
-                  <Alert variant="destructive">
-                    <AlertTitle>Error</AlertTitle>
-                    <AlertDescription>{stream.errorMessage}</AlertDescription>
-                  </Alert>
-                )}
               </>
             }
           />
