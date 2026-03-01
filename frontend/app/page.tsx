@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
-import { healthCheck, loadModels, startDetect } from "@/lib/backend";
+import { healthCheck, loadModels, startDetect, uploadFile } from "@/lib/backend";
 import { useDetectStream } from "@/hooks/useDetectStream";
 import { Button } from "@/components/ui/button";
 import {
@@ -78,7 +78,13 @@ export default function Home() {
   const loadModelsStream = useDetectStream(loadModelsJobId);
 
   const detectMutation = useMutation({
-    mutationFn: startDetect,
+    mutationFn: async (file: File) => {
+      const { path } = await uploadFile(file);
+      const ext = file.name.toLowerCase().slice(file.name.lastIndexOf("."));
+      const modality = "image";
+      // const modality = ext === ".mp4" ? "video" : "image";
+      return startDetect({ input_path: path, modality });
+    },
     onSuccess: (data) => setJobId(data.job_id),
     onError: (err) => {
       toast.error(err instanceof Error ? err.message : "Failed to start detection");
@@ -277,7 +283,7 @@ export default function Home() {
             footer={
               <>
                 <Button
-                  onClick={() => detectMutation.mutate()}
+                  onClick={() => selectedFile && detectMutation.mutate(selectedFile)}
                   disabled={!canRun}
                   style={{ width: "100%" }}
                 >

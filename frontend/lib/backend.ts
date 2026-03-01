@@ -10,13 +10,39 @@ export async function healthCheck(): Promise<HealthResponse> {
   return res.json() as Promise<HealthResponse>;
 }
 
+export type UploadResponse = { path: string };
+
+export async function uploadFile(file: File): Promise<UploadResponse> {
+  const formData = new FormData();
+  formData.append("file", file);
+  const res = await fetch(`${API_BASE}/upload`, {
+    method: "POST",
+    body: formData,
+  });
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}));
+    throw new Error((data as { detail?: string }).detail ?? `Upload failed: ${res.status}`);
+  }
+  return res.json() as Promise<UploadResponse>;
+}
+
 export type StartDetectResponse = { job_id: string };
 
-export async function startDetect(): Promise<StartDetectResponse> {
-  const res = await fetch(`${API_BASE}/detect`, { method: "POST" });
+export type StartDetectBody = {
+  input_path: string;
+  output_dir?: string;
+  modality?: string;
+};
+
+export async function startDetect(body: StartDetectBody): Promise<StartDetectResponse> {
+  const res = await fetch(`${API_BASE}/detect`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
   if (!res.ok) {
-    const body = await res.json().catch(() => ({}));
-    throw new Error((body as { message?: string }).message ?? `Detect failed: ${res.status}`);
+    const data = await res.json().catch(() => ({}));
+    throw new Error((data as { message?: string }).message ?? `Detect failed: ${res.status}`);
   }
   return res.json() as Promise<StartDetectResponse>;
 }

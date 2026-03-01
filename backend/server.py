@@ -23,10 +23,6 @@ logging.basicConfig(
     stream = sys.stdout,
     force = True)
 
-# Hardcoded paths for /detect (run server from backend/ so these resolve)
-INPUT_PATH = "data/test_2/yolo.png"
-OUTPUT_DIR = "data/test_2"
-MODALITY = "image"
 
 # In-memory job store: job_id -> { "queue": queue.Queue, "status": str }
 jobs: dict[str, dict] = {}
@@ -108,7 +104,7 @@ async def upload(file: UploadFile = File(...)):
 
 
 @app.post("/detect")
-async def detect():
+async def detect(body: dict | None = None):
     app_gatector = getattr(app.state, "app_gatector", None)
     if app_gatector is None:
         return JSONResponse(content = {"status": "error", "message": "AppGatector not initialized"},
@@ -119,9 +115,9 @@ async def detect():
     thread = threading.Thread(target = run_pipeline_job,
                               args = (app_gatector, job_id, job_queue),
                               kwargs = {"method_name": "detect_sync",
-                                        "method_kwargs": {"input_file_path": INPUT_PATH,
-                                                          "output_dir": OUTPUT_DIR,
-                                                          "modality": MODALITY}},
+                                        "method_kwargs": {"input_file_path": body["input_path"],
+                                                          "output_dir": body["output_dir"],
+                                                          "modality": body["modality"]}},
                               daemon = True)
     thread.start()
     return JSONResponse(content = {"job_id": job_id}, status_code = 201)
