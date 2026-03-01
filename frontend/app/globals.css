@@ -49,11 +49,11 @@
 :root {
   --radius: 12px;
   --background:  rgb(6, 10, 28);
-  --foreground:  #ffffff;
+  --foreground:  #fffdf0;
   --card:  #0d1428;
-  --card-foreground:  rgb(249, 222, 116);
-  --popover:  #ffffff;
-  --popover-foreground:  #252525;
+  --card-foreground:  #fffdf0; /*rgb(249, 222, 116);*/
+  --popover:  #fffdf0;
+  --popover-foreground:  #ffdc5f;
   --primary:  #353535;
   --primary-foreground:  #fafafa;
   --secondary:  #f5f5f5;

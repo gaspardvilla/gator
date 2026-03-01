@@ -87,10 +87,19 @@ export function FileDropzone({
         }}
       >
         <input {...getInputProps()} />
-        <CardHeader>
+        <CardHeader
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+            flex: 1,
+            minHeight: 0,
+          }}
+        >
           <CardTitle
             style={{
-              display: "inline-flex",
+              display: "flex",
               alignItems: "center",
               justifyContent: "center",
               gap: spacing[2],
@@ -104,10 +113,10 @@ export function FileDropzone({
           </CardTitle>
           <CardDescription
             style={{
-              display: "inline-flex",
+              display: "flex",
               alignItems: "center",
-              fontSize: fontSizes.sm,
               justifyContent: "center",
+              fontSize: fontSizes.sm,
               color: "var(--muted-foreground)",
             }}
           >

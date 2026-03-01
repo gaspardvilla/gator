@@ -185,12 +185,14 @@ export default function Home() {
             overflow: "auto",
           }}
         >
-          <Card style={{ flexShrink: 0 }}>
+          <Card style={{ 
+            flexShrink: 0, 
+            gap: spacing[2] }}>
             <CardHeader>
               <CardTitle
                 style={{
                   fontSize: fontSizes.lg,
-                  fontWeight: 700,
+                  fontWeight: 600,
                   textAlign: "center",
                 }}
               >
@@ -298,14 +300,30 @@ export default function Home() {
         </section>
 
         <section style={{ minHeight: 0, display: "flex", flexDirection: "column" }}>
-          <Card style={{ flex: 1, minHeight: 0, display: "flex", flexDirection: "column" }}>
-            <CardHeader>
-              <CardTitle style={{ fontSize: fontSizes.base, fontWeight: 600 }}>
+          <Card style={{ 
+            flex: 1, 
+            minHeight: 0, 
+            display: "flex", 
+            flexDirection: "column",
+            borderRadius: radius.outer,
+          }}>
+            <CardHeader style={{ 
+              textAlign: "center",
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              justifyContent: "center",
+              flex: 1,
+            }}>
+              <CardTitle style={{ 
+                fontSize: fontSizes.lg, 
+                fontWeight: 600}}>
                 Output
               </CardTitle>
               <CardDescription
                 style={{
                   fontSize: fontSizes.sm,
+                  textAlign: "center",
                   color: "var(--muted-foreground)",
                 }}
               >
@@ -314,43 +332,6 @@ export default function Home() {
                   : "Result will appear here after detection"}
               </CardDescription>
             </CardHeader>
-            <CardContent style={{ flex: 1, minHeight: 0, overflow: "auto" }}>
-              {stream.status === "done" && jobId && stream.outputType ? (
-                <div
-                  style={{
-                    display: "flex",
-                    flexDirection: "column",
-                    alignItems: "center",
-                    width: "100%",
-                    maxWidth: "100%",
-                  }}
-                >
-                  {stream.outputType === "video" ? (
-                    <video
-                      src={outputUrl(jobId)}
-                      controls
-                      playsInline
-                      style={{ maxWidth: "100%", height: "auto", borderRadius: radius.outer }}
-                    />
-                  ) : (
-                    <img
-                      src={outputUrl(jobId)}
-                      alt="Detection result"
-                      style={{ maxWidth: "100%", height: "auto", borderRadius: radius.outer }}
-                    />
-                  )}
-                </div>
-              ) : (
-                <p
-                  style={{
-                    fontSize: fontSizes.sm,
-                    color: "var(--muted-foreground)",
-                  }}
-                >
-                  Output video or image will be shown here after detection completes.
-                </p>
-              )}
-            </CardContent>
           </Card>
         </section>
       </main>
