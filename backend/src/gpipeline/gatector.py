@@ -370,7 +370,7 @@ class Gatector():
 
     def _create_response(self, success: bool, 
                          message: str, 
-                         data: dict = None) -> dict:
+                         data: dict = {}) -> dict:
         if not isinstance(data, dict):
             message = f"Data must be a dictionary but got {type(data)}"
             logger.error(message)

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
-import { healthCheck, startDetect } from "@/lib/backend";
+import { healthCheck, loadModels, startDetect } from "@/lib/backend";
 import { useDetectStream } from "@/hooks/useDetectStream";
 import { Button } from "@/components/ui/button";
 import {
@@ -56,6 +56,7 @@ const GAZE_MODE_OPTIONS = [
 
 export default function Home() {
   const [jobId, setJobId] = useState<string | null>(null);
+  const [loadModelsJobId, setLoadModelsJobId] = useState<string | null>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [device, setDevice] = useState<string>("cpu");
   const [gazeMode, setGazeMode] = useState<string>("GazeFollow360");
@@ -66,6 +67,19 @@ export default function Home() {
     refetchInterval: 10_000,
     retry: 2,
   });
+
+  const loadModelsMutation = useMutation({
+    mutationFn: (body: { device: string; gaze_training_mode: string }) => loadModels(body),
+    onSuccess: (data) => {
+      setLoadModelsJobId(data.job_id);
+      toast.success("Loading models…");
+    },
+    onError: (err) => {
+      toast.error(err instanceof Error ? err.message : "Failed to start load models");
+    },
+  });
+
+  const loadModelsStream = useDetectStream(loadModelsJobId);
 
   const detectMutation = useMutation({
     mutationFn: startDetect,
@@ -80,6 +94,9 @@ export default function Home() {
 
   const stream = useDetectStream(jobId);
 
+  const isLoadModelsRunning =
+    loadModelsStream.status === "running" ||
+    (loadModelsMutation.isPending && loadModelsStream.status !== "error");
   const isRunning =
     stream.status === "running" || (detectMutation.isPending && !stream.errorMessage);
   const canRun = isHealthy && !isRunning && !!selectedFile;
@@ -144,7 +161,18 @@ export default function Home() {
                   </SelectContent>
                 </Select>
               </Field>
-              <Button className="w-full">Load models</Button>
+              <Button
+                className="w-full"
+                onClick={() =>
+                  loadModelsMutation.mutate({
+                    device,
+                    gaze_training_mode: gazeMode,
+                  })
+                }
+                disabled={isLoadModelsRunning}
+              >
+                {isLoadModelsRunning ? "Loading…" : "Load models"}
+              </Button>
             </CardContent>
           </Card>
           <FileDropzone
