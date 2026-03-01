@@ -8,6 +8,7 @@ import pandas as pd
 from PIL import Image
 import subprocess as sp
 from boxmot import OCSORT
+from typing import Callable
 from functools import partial
 from matplotlib import colormaps
 from torch.utils.data import DataLoader
@@ -48,32 +49,53 @@ class Gatector():
         self.window_stride = window_stride
         self.num_workers = num_workers
         self.gaze_training_mode = gaze_training_mode
+        self._progress_callback = None
 
         # Pre-load all the models
         self._load_models()
 
 
-    async def run(self, input_file_path: str, 
-                  output_dir: str,
-                  modality: str = 'image') -> None:
+    @property
+    def progress_callback(self) -> Callable[[str], None] | None:
+        return self._progress_callback
+
+    @progress_callback.setter
+    def progress_callback(self, value: Callable[[str], None] | None) -> None:
+        self._progress_callback = value
+
+    def send_progress(self, name: str) -> None:
+        if self._progress_callback is not None:
+            self._progress_callback(name)
+
+
+    def run(self, input_file_path: str,
+            output_dir: str,
+            modality: str = "image",
+            progress_callback: Callable[[str], None] | None = None,) -> dict | None:
+        self.progress_callback = progress_callback
         # 0. Load the input file
         logger.info(f"Loading input file: {input_file_path}")
         if not self._load_input_file(input_file_path, output_dir, modality):
             message = f"Failed to load input file: {input_file_path}"
             logger.error(message)
             return self._create_response(success = False, message = message)
+        self.send_progress("input_loaded")
 
         # 1. Detect and track heads
         logger.info(f"Detecting and tracking heads")
         self._detect_and_track_heads()
+        self.send_progress("heads_detected")
 
         # 2. Predict gaze
         logger.info(f"Predicting gaze")
         self._predict_gaze()
+        self.send_progress("gaze_predicted")
 
         # 3. Draw the predicted gaze on the input video/image
         logger.info(f"Drawing predicted gaze on the input file")
+        self.send_progress("drawing")
         self._draw_predicted_gaze()
+        return None
 
 
     def _draw_predicted_gaze(self):
