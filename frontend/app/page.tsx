@@ -115,25 +115,74 @@ export default function Home() {
   const canRun = isHealthy && !isRunning && !!selectedFile;
 
   return (
-    <div className="min-h-screen p-6">
-      <header className="mx-auto mb-8 max-w-4xl text-center">
-        <h1 className="text-3xl font-semibold tracking-tight">Gatector</h1>
-        <p className="mt-2 text-muted-foreground">
+    <div
+      style={{
+        minHeight: "100vh",
+        padding: "1.5rem",
+      }}
+    >
+      <header
+        style={{
+          margin: "0 auto 2rem",
+          maxWidth: "56rem",
+          textAlign: "center",
+        }}
+      >
+        <h1
+          style={{
+            fontSize: "1.875rem",
+            fontWeight: 600,
+            letterSpacing: "-0.025em",
+            lineHeight: 1.2,
+          }}
+        >
+          Gatector
+        </h1>
+        <p
+          style={{
+            marginTop: "0.5rem",
+            color: "var(--muted-foreground)",
+            fontSize: "0.875rem",
+          }}
+        >
           Extract 3D gaze from video or images. Upload a file, run detection, and view the result.
         </p>
       </header>
 
-      <main className="mx-auto grid w-full max-w-4xl grid-cols-1 gap-6 md:grid-cols-[1fr_1.2fr]">
-        <section className="flex flex-col gap-4">
+      <main
+        className="grid-cols-1 md:grid-cols-[1fr_1.2fr]"
+        style={{
+          margin: "0 auto",
+          display: "grid",
+          width: "100%",
+          maxWidth: "56rem",
+          gap: "1.5rem",
+        }}
+      >
+        <section
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            gap: "1rem",
+          }}
+        >
           <Card>
             <CardHeader>
-              <CardTitle className="text-lg font-bold text-center">Model settings</CardTitle>
+              <CardTitle
+                style={{
+                  fontSize: "1.125rem",
+                  fontWeight: 700,
+                  textAlign: "center",
+                }}
+              >
+                Model settings
+              </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
               <Field orientation="vertical">
                 <FieldLabel>Device</FieldLabel>
                 <Select value={device} onValueChange={setDevice}>
-                  <SelectTrigger className="w-full">
+                  <SelectTrigger style={{ width: "100%" }}>
                     <SelectValue placeholder="Choose device">
                       {DEVICE_OPTIONS.find((o) => o.value === device)?.label}
                     </SelectValue>
@@ -141,9 +190,20 @@ export default function Home() {
                   <SelectContent>
                     {DEVICE_OPTIONS.map((opt) => (
                       <SelectItem key={opt.value} value={opt.value}>
-                        <div className="flex flex-col gap-0.5">
-                          <span className="font-medium">{opt.label}</span>
-                          <span className="text-xs text-muted-foreground">
+                        <div
+                          style={{
+                            display: "flex",
+                            flexDirection: "column",
+                            gap: "0.125rem",
+                          }}
+                        >
+                          <span style={{ fontWeight: 500 }}>{opt.label}</span>
+                          <span
+                            style={{
+                              fontSize: "0.75rem",
+                              color: "var(--muted-foreground)",
+                            }}
+                          >
                             {opt.description}
                           </span>
                         </div>
@@ -155,7 +215,7 @@ export default function Home() {
               <Field orientation="vertical">
                 <FieldLabel>Gaze model training mode</FieldLabel>
                 <Select value={gazeMode} onValueChange={setGazeMode}>
-                  <SelectTrigger className="w-full">
+                  <SelectTrigger style={{ width: "100%" }}>
                     <SelectValue placeholder="Choose gaze model">
                       {GAZE_MODE_OPTIONS.find((o) => o.value === gazeMode)?.label}
                     </SelectValue>
@@ -163,9 +223,20 @@ export default function Home() {
                   <SelectContent>
                     {GAZE_MODE_OPTIONS.map((opt) => (
                       <SelectItem key={opt.value} value={opt.value}>
-                        <div className="flex flex-col gap-0.5">
-                          <span className="font-medium">{opt.label}</span>
-                          <span className="text-xs text-muted-foreground">
+                        <div
+                          style={{
+                            display: "flex",
+                            flexDirection: "column",
+                            gap: "0.125rem",
+                          }}
+                        >
+                          <span style={{ fontWeight: 500 }}>{opt.label}</span>
+                          <span
+                            style={{
+                              fontSize: "0.75rem",
+                              color: "var(--muted-foreground)",
+                            }}
+                          >
                             {opt.description}
                           </span>
                         </div>
@@ -175,7 +246,7 @@ export default function Home() {
                 </Select>
               </Field>
               <Button
-                className="w-full"
+                style={{ width: "100%" }}
                 onClick={() =>
                   loadModelsMutation.mutate({
                     device,
@@ -192,79 +263,85 @@ export default function Home() {
             file={selectedFile}
             onFileSelected={setSelectedFile}
             disabled={isRunning}
+            footer={
+              <>
+                <Button
+                  onClick={() => detectMutation.mutate()}
+                  disabled={!canRun}
+                  style={{ width: "100%" }}
+                >
+                  {isRunning ? "Running…" : "Run detection"}
+                </Button>
+                {stream.checkpoints.length > 0 && (
+                  <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
+                    <p
+                      style={{
+                        fontSize: "0.875rem",
+                        fontWeight: 500,
+                      }}
+                    >
+                      Progress
+                    </p>
+                    <ul
+                      style={{
+                        listStylePosition: "inside",
+                        listStyleType: "disc",
+                        display: "flex",
+                        flexDirection: "column",
+                        gap: "0.25rem",
+                        fontSize: "0.875rem",
+                        color: "var(--muted-foreground)",
+                      }}
+                    >
+                      {stream.checkpoints.map((cp, i) => (
+                        <li key={`${cp}-${i}`}>
+                          {CHECKPOINT_LABELS[cp] ?? cp}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+                {stream.status === "done" && stream.outputDir && (
+                  <Alert>
+                    <AlertTitle>Done</AlertTitle>
+                    <AlertDescription>
+                      Output saved to {stream.outputDir}
+                    </AlertDescription>
+                  </Alert>
+                )}
+                {stream.status === "error" && stream.errorMessage && (
+                  <Alert variant="destructive">
+                    <AlertTitle>Error</AlertTitle>
+                    <AlertDescription>{stream.errorMessage}</AlertDescription>
+                  </Alert>
+                )}
+              </>
+            }
           />
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-base">Detection</CardTitle>
-              <CardDescription>Backend status and run</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex items-center gap-2">
-                <span
-                  className={`inline-block h-2.5 w-2.5 rounded-full ${
-                    isHealthy ? "bg-green-500" : healthLoading ? "bg-amber-500 animate-pulse" : "bg-red-500"
-                  }`}
-                  aria-hidden
-                />
-                <span className="text-sm text-muted-foreground">
-                  {healthLoading
-                    ? "Checking backend…"
-                    : isHealthy
-                      ? "Backend ready"
-                      : "Backend unavailable"}
-                </span>
-              </div>
-
-              <Button
-                onClick={() => detectMutation.mutate()}
-                disabled={!canRun}
-                className="w-full"
-              >
-                {isRunning ? "Running…" : "Run detection"}
-              </Button>
-
-              {stream.checkpoints.length > 0 && (
-                <div className="space-y-2">
-                  <p className="text-sm font-medium">Progress</p>
-                  <ul className="list-inside list-disc space-y-1 text-sm text-muted-foreground">
-                    {stream.checkpoints.map((cp, i) => (
-                      <li key={`${cp}-${i}`}>
-                        {CHECKPOINT_LABELS[cp] ?? cp}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-
-              {stream.status === "done" && stream.outputDir && (
-                <Alert>
-                  <AlertTitle>Done</AlertTitle>
-                  <AlertDescription>
-                    Output saved to {stream.outputDir}
-                  </AlertDescription>
-                </Alert>
-              )}
-
-              {stream.status === "error" && stream.errorMessage && (
-                <Alert variant="destructive">
-                  <AlertTitle>Error</AlertTitle>
-                  <AlertDescription>{stream.errorMessage}</AlertDescription>
-                </Alert>
-              )}
-            </CardContent>
-          </Card>
         </section>
 
         <section>
-          <Card className="min-h-[320px]">
+          <Card style={{ minHeight: "320px" }}>
             <CardHeader>
-              <CardTitle className="text-base">Output</CardTitle>
-              <CardDescription>
+              <CardTitle style={{ fontSize: "1rem", fontWeight: 600 }}>
+                Output
+              </CardTitle>
+              <CardDescription
+                style={{
+                  fontSize: "0.875rem",
+                  color: "var(--muted-foreground)",
+                }}
+              >
                 Result will appear here after detection
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <p className="text-sm text-muted-foreground">
+              <p
+                style={{
+                  fontSize: "0.875rem",
+                  color: "var(--muted-foreground)",
+                }}
+              >
                 Output video or image will be shown here.
               </p>
             </CardContent>

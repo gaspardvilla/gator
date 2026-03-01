@@ -7,10 +7,11 @@ import {
   Card,
   CardContent,
   CardDescription,
+  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { UploadIcon } from "lucide-react";
+import { CheckIcon, UploadIcon } from "lucide-react";
 
 const ACCEPT = {
   "image/png": [".png"],
@@ -22,6 +23,7 @@ export type FileDropzoneProps = {
   file: File | null;
   disabled?: boolean;
   className?: string;
+  footer?: React.ReactNode;
 };
 
 export function FileDropzone({
@@ -29,6 +31,7 @@ export function FileDropzone({
   file,
   disabled = false,
   className,
+  footer,
 }: FileDropzoneProps) {
   const onDrop = useCallback(
     (acceptedFiles: File[]) => {
@@ -49,38 +52,72 @@ export function FileDropzone({
 
   return (
     <Card
-      {...getRootProps()}
-      className={cn(
-        "cursor-pointer transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
-        isDragActive && "border-primary bg-muted/50",
-        disabled && "cursor-not-allowed opacity-60",
-        className
-      )}
+      className={cn(className)}
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        gap: "1rem",
+        padding: "1rem",
+      }}
     >
-      <input {...getInputProps()} />
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2 text-base">
-          <UploadIcon className="size-4" />
-          Drop file here
-        </CardTitle>
-        <CardDescription>
-          .png or .mp4 only. Click or drag and drop.
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        {file ? (
-          <p className="text-sm font-medium text-foreground">
-            {file.name}
-            <span className="ml-1 text-muted-foreground">
-              ({(file.size / 1024).toFixed(1)} KB)
-            </span>
-          </p>
-        ) : (
-          <p className="text-sm text-muted-foreground">
-            No file selected
-          </p>
-        )}
-      </CardContent>
+      <Card
+        {...getRootProps()}
+        className="focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+        style={{
+          backgroundColor: isDragActive ? "color-mix(in oklch, var(--muted) 50%, transparent)" : "transparent",
+          borderWidth: "1px",
+          borderStyle: file ? "solid" : "dashed",
+          borderColor: "var(--muted-foreground)",
+          borderRadius: "var(--radius)",
+          cursor: disabled ? "not-allowed" : "pointer",
+          opacity: disabled ? 0.6 : 1,
+          outline: "none",
+          transition: "border-color 0.2s, background-color 0.2s, box-shadow 0.2s",
+        }}
+      >
+        <input {...getInputProps()} />
+        <CardHeader>
+          <CardTitle
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: "0.5rem",
+              fontSize: "1rem",
+              lineHeight: "1",
+              fontWeight: 600,
+            }}
+          >
+            {file ? <CheckIcon className="size-4" /> : <UploadIcon className="size-4" />}
+            {file ? "File selected" : "Drop file here"}
+          </CardTitle>
+          <CardDescription
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              fontSize: "0.875rem",
+              justifyContent: "center",
+              color: "var(--muted-foreground)",
+            }}
+          >
+            {file
+              ? `${file.name} (${(file.size / 1024).toFixed(1)} KB)`
+              : ".png or .mp4 file"}
+          </CardDescription>
+        </CardHeader>
+      </Card>
+      {footer != null ? (
+        <CardFooter
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            gap: "1rem",
+            paddingTop: 0,
+          }}
+        >
+          {footer}
+        </CardFooter>
+      ) : null}
     </Card>
   );
 }
