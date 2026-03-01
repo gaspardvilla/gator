@@ -6,6 +6,7 @@ import queue
 import logging
 import asyncio
 import threading
+from typing import Any
 from contextlib import asynccontextmanager
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi import FastAPI, File, HTTPException, UploadFile
@@ -31,45 +32,28 @@ MODALITY = "image"
 jobs: dict[str, dict] = {}
 
 
-def initialize_pipeline(app_gatector: AppGatector, job_id: str, job_queue: queue.Queue) -> None:
-    # Callback function to send progress updates to the client
+def run_pipeline_job(app_gatector: AppGatector,
+                     job_id: str,
+                     job_queue: queue.Queue,
+                     method_name: str,
+                     method_kwargs: dict[str, Any] | None = None) -> None:
+    """Run an AppGatector method in a thread. Each method must return {'success': bool, 'data': dict}.
+    On success the done event is {checkpoint: 'done', **data}; on failure {checkpoint: 'error', message: data['message']}."""
+    method_kwargs = method_kwargs or {}
+
     def progress_callback(checkpoint: str) -> None:
         job_queue.put({"checkpoint": checkpoint})
 
-    # Initialize the pipeline
     try:
-        result = app_gatector.initialize(progress_callback = progress_callback)
-        if result is not None:
-            job_queue.put({"checkpoint": "error", "message": result.get("message", "Unknown error")})
-            jobs[job_id]["status"] = "error"
-        else:
-            job_queue.put({"checkpoint": "done"})
+        method = getattr(app_gatector, method_name)
+        result = method(progress_callback=progress_callback, **method_kwargs)
+        if result.get("success"):
+            job_queue.put({"checkpoint": "done", **result.get("data", {})})
             jobs[job_id]["status"] = "done"
-    except Exception as e:
-        job_queue.put({"checkpoint": "error", "message": str(e)})
-        jobs[job_id]["status"] = "error"
-
-
-def detect_pipeline(app_gatector: AppGatector, job_id: str, job_queue: queue.Queue) -> None:
-    # Callback function to send progress updates to the client
-    def progress_callback(checkpoint: str) -> None:
-        job_queue.put({"checkpoint": checkpoint})
-
-    # Run the pipeline
-    try:
-        result = app_gatector.detect_sync(input_file_path = INPUT_PATH,
-                                          output_dir = OUTPUT_DIR,
-                                          modality = MODALITY,
-                                          progress_callback = progress_callback)
-        # If the pipeline failed, send an error event to the client
-        if result is not None:
-            job_queue.put({"checkpoint": "error", "message": result.get("message", "Unknown error")})
-            jobs[job_id]["status"] = "error"
-        # If the pipeline ran successfully, send a done event to the client
         else:
-            job_queue.put({"checkpoint": "done", "output_dir": OUTPUT_DIR})
-            jobs[job_id]["status"] = "done"
-    # Handle any errors that occur during the pipeline
+            err_msg = result.get("message") or result.get("data", {}).get("message", "Unknown error")
+            job_queue.put({"checkpoint": "error", "message": err_msg})
+            jobs[job_id]["status"] = "error"
     except Exception as e:
         job_queue.put({"checkpoint": "error", "message": str(e)})
         jobs[job_id]["status"] = "error"
@@ -132,8 +116,12 @@ async def detect():
     job_id = uuid.uuid4().hex
     job_queue: queue.Queue = queue.Queue()
     jobs[job_id] = {"queue": job_queue, "status": "running"}
-    thread = threading.Thread(target = detect_pipeline,
+    thread = threading.Thread(target = run_pipeline_job,
                               args = (app_gatector, job_id, job_queue),
+                              kwargs = {"method_name": "detect_sync",
+                                        "method_kwargs": {"input_file_path": INPUT_PATH,
+                                                          "output_dir": OUTPUT_DIR,
+                                                          "modality": MODALITY}},
                               daemon = True)
     thread.start()
     return JSONResponse(content = {"job_id": job_id}, status_code = 201)
@@ -148,11 +136,12 @@ async def initialize():
     job_id = uuid.uuid4().hex
     job_queue: queue.Queue = queue.Queue()
     jobs[job_id] = {"queue": job_queue, "status": "running"}
-    thread = threading.Thread(target = initialize_pipeline,
+    thread = threading.Thread(target = run_pipeline_job,
                               args = (app_gatector, job_id, job_queue),
+                              kwargs = {"method_name": "initialize", "method_kwargs": {}},
                               daemon = True)
     thread.start()
-    return JSONResponse(content = {"status": "ok"}, status_code = 200)
+    return JSONResponse(content = {"job_id": job_id}, status_code = 201)
 
 
 @app.get("/jobs/{job_id}/stream")

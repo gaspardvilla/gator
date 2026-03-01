@@ -49,76 +49,101 @@ export default function Home() {
 
   const isRunning =
     stream.status === "running" || (detectMutation.isPending && !stream.errorMessage);
-  const canRun = isHealthy && !isRunning;
+  const canRun = isHealthy && !isRunning && !!selectedFile;
 
   return (
-    <div className="flex min-h-screen items-center justify-center p-6">
-      <main className="w-full max-w-lg space-y-6">
-        <FileDropzone
-          file={selectedFile}
-          onFileSelected={setSelectedFile}
-          disabled={isRunning}
-        />
-        <Card>
-          <CardHeader>
-            <CardTitle>Gatector</CardTitle>
-            <CardDescription>3D gaze extraction from video</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="flex items-center gap-2">
-              <span
-                className={`inline-block h-2.5 w-2.5 rounded-full ${
-                  isHealthy ? "bg-green-500" : healthLoading ? "bg-amber-500 animate-pulse" : "bg-red-500"
-                }`}
-                aria-hidden
-              />
-              <span className="text-sm text-muted-foreground">
-                {healthLoading
-                  ? "Checking backend…"
-                  : isHealthy
-                    ? "Backend ready"
-                    : "Backend unavailable"}
-              </span>
-            </div>
+    <div className="min-h-screen p-6">
+      <header className="mx-auto mb-8 max-w-4xl text-center">
+        <h1 className="text-3xl font-semibold tracking-tight">Gatector</h1>
+        <p className="mt-2 text-muted-foreground">
+          Extract 3D gaze from video or images. Upload a file, run detection, and view the result.
+        </p>
+      </header>
 
-            <Button
-              onClick={() => detectMutation.mutate()}
-              disabled={!canRun}
-              className="w-full"
-            >
-              {isRunning ? "Running…" : "Run detection"}
-            </Button>
-
-            {stream.checkpoints.length > 0 && (
-              <div className="space-y-2">
-                <p className="text-sm font-medium">Progress</p>
-                <ul className="list-inside list-disc space-y-1 text-sm text-muted-foreground">
-                  {stream.checkpoints.map((cp, i) => (
-                    <li key={`${cp}-${i}`}>
-                      {CHECKPOINT_LABELS[cp] ?? cp}
-                    </li>
-                  ))}
-                </ul>
+      <main className="mx-auto grid w-full max-w-4xl grid-cols-1 gap-6 md:grid-cols-[1fr_1.2fr]">
+        <section className="flex flex-col gap-4">
+          <FileDropzone
+            file={selectedFile}
+            onFileSelected={setSelectedFile}
+            disabled={isRunning}
+          />
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-base">Detection</CardTitle>
+              <CardDescription>Backend status and run</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="flex items-center gap-2">
+                <span
+                  className={`inline-block h-2.5 w-2.5 rounded-full ${
+                    isHealthy ? "bg-green-500" : healthLoading ? "bg-amber-500 animate-pulse" : "bg-red-500"
+                  }`}
+                  aria-hidden
+                />
+                <span className="text-sm text-muted-foreground">
+                  {healthLoading
+                    ? "Checking backend…"
+                    : isHealthy
+                      ? "Backend ready"
+                      : "Backend unavailable"}
+                </span>
               </div>
-            )}
 
-            {stream.status === "done" && stream.outputDir && (
-              <Alert>
-                <AlertTitle>Done</AlertTitle>
-                <AlertDescription>
-                  Output saved to {stream.outputDir}
-                </AlertDescription>
-              </Alert>
-            )}
+              <Button
+                onClick={() => detectMutation.mutate()}
+                disabled={!canRun}
+                className="w-full"
+              >
+                {isRunning ? "Running…" : "Run detection"}
+              </Button>
 
-            {stream.status === "error" && stream.errorMessage && (
-              <Alert variant="destructive">
-                <AlertTitle>Error</AlertTitle>
-                <AlertDescription>{stream.errorMessage}</AlertDescription>
-              </Alert>
-            )}
-          </CardContent>
-        </Card>
+              {stream.checkpoints.length > 0 && (
+                <div className="space-y-2">
+                  <p className="text-sm font-medium">Progress</p>
+                  <ul className="list-inside list-disc space-y-1 text-sm text-muted-foreground">
+                    {stream.checkpoints.map((cp, i) => (
+                      <li key={`${cp}-${i}`}>
+                        {CHECKPOINT_LABELS[cp] ?? cp}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              {stream.status === "done" && stream.outputDir && (
+                <Alert>
+                  <AlertTitle>Done</AlertTitle>
+                  <AlertDescription>
+                    Output saved to {stream.outputDir}
+                  </AlertDescription>
+                </Alert>
+              )}
+
+              {stream.status === "error" && stream.errorMessage && (
+                <Alert variant="destructive">
+                  <AlertTitle>Error</AlertTitle>
+                  <AlertDescription>{stream.errorMessage}</AlertDescription>
+                </Alert>
+              )}
+            </CardContent>
+          </Card>
+        </section>
+
+        <section>
+          <Card className="min-h-[320px]">
+            <CardHeader>
+              <CardTitle className="text-base">Output</CardTitle>
+              <CardDescription>
+                Result will appear here after detection
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <p className="text-sm text-muted-foreground">
+                Output video or image will be shown here.
+              </p>
+            </CardContent>
+          </Card>
+        </section>
       </main>
     </div>
   );

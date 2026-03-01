@@ -52,15 +52,24 @@ class Gatector():
         self._progress_callback = None
 
 
-    def initialize(self, progress_callback: Callable[[str], None] | None = None):
-        self.progress_callback = progress_callback
-        self._load_models()
+    def initialize(self, progress_callback: Callable[[str], None] | None = None) -> dict:
+        """Load models. Returns _create_response(success, message, data)."""
+        self._progress_callback = progress_callback
+        try:
+            self._load_models()
+            message = f"Models loaded successfully"
+            logger.info(message)
+            return self._create_response(success = True, message = message)
+        except Exception as e:
+            message = f"Model loading failed: {str(e)}"
+            logger.error(message)
+            return self._create_response(success = False, message = message)
 
 
     def run(self, input_file_path: str,
             output_dir: str,
             modality: str = "image",
-            progress_callback: Callable[[str], None] | None = None,) -> dict | None:
+            progress_callback: Callable[[str], None] | None = None,) -> dict:
         # Set the progress callback
         self.progress_callback = progress_callback
 
@@ -86,7 +95,11 @@ class Gatector():
         logger.info(f"Drawing predicted gaze on the input file")
         self._send_progress("drawing")
         self._draw_predicted_gaze()
-        return None
+        message = f"Prediction completed successfully"
+        logger.info(message)
+        return self._create_response(success = True, 
+                                     message = message, 
+                                     data = {"output_dir": self.output_dir})
 
 
     def _draw_predicted_gaze(self):

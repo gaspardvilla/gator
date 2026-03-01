@@ -14,25 +14,26 @@ class AppGatector:
                                  gaze_training_mode = "GazeFollow360")
 
 
-    def initialize(self):
-        self.gatector.initialize()
-    
+    def initialize(self, progress_callback: Callable[[str], None] | None = None) -> dict:
+        return self.gatector.initialize(progress_callback=progress_callback)
+
 
     def detect_sync(self, input_file_path: str,
                     output_dir: str,
                     modality: str = "image",
-                    progress_callback: Callable[[str], None] | None = None,) -> dict | None:
-        """Run the pipeline synchronously (for use in a background thread). 
-        Returns error dict on failure, None on success."""
+                    progress_callback: Callable[[str], None] | None = None,) -> dict:
+        """Run the pipeline synchronously (for use in a background thread).
+        Returns {'success': bool, 'data': {}}; on success data may include e.g. output_dir."""
         return self.gatector.run(input_file_path = input_file_path,
                                  output_dir = output_dir,
                                  modality = modality,
                                  progress_callback = progress_callback,)
 
+
     async def detect(self, input_file_path: str,
                      output_dir: str,
-                     modality: str = 'image') -> dict | None:
-        """Legacy async entrypoint; runs sync pipeline. Prefer detect_sync from 
+                     modality: str = 'image') -> dict:
+        """Legacy async entrypoint; runs sync pipeline. Prefer detect_sync from
         a thread for async API."""
         return self.gatector.run(input_file_path = input_file_path,
                                  output_dir = output_dir,
