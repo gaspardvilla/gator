@@ -39,22 +39,24 @@ COLORS = [
 
 
 class Gatector():
-    def __init__(self, device: str,
-                 batch_size: int,
+    def __init__(self, batch_size: int,
                  num_workers: int,
-                 window_stride: int = 1,
-                 gaze_training_mode : str = "GazeFollow360",):
-        self.device = device
+                 window_stride: int = 1):
         self.batch_size = batch_size
         self.window_stride = window_stride
         self.num_workers = num_workers
-        self.gaze_training_mode = gaze_training_mode
         self._progress_callback = None
 
 
-    def initialize(self, progress_callback: Callable[[str], None] | None = None) -> dict:
+    def load_models(self, device: str, 
+                    gaze_training_mode: str,
+                    progress_callback: Callable[[str], None] | None = None) -> dict:
         """Load models. Returns _create_response(success, message, data)."""
+        # Init
+        self.device = device
+        self.gaze_training_mode = gaze_training_mode
         self._progress_callback = progress_callback
+        
         try:
             self._load_models()
             message = f"Models loaded successfully"

@@ -7,15 +7,17 @@ logger = logging.getLogger(__name__)
 
 class AppGatector:
     def __init__(self):
-        self.gatector = Gatector(device = "cpu",
-                                 batch_size = 24,
+        self.gatector = Gatector(batch_size = 24,
                                  num_workers = 4,
-                                 window_stride = 1,
-                                 gaze_training_mode = "GazeFollow360")
+                                 window_stride = 1)
 
 
-    def initialize(self, progress_callback: Callable[[str], None] | None = None) -> dict:
-        return self.gatector.initialize(progress_callback=progress_callback)
+    def load_models(self, device: str, 
+                    gaze_training_mode: str,
+                    progress_callback: Callable[[str], None] | None = None) -> dict:
+        return self.gatector.load_models(device = device,
+                                         gaze_training_mode = gaze_training_mode,
+                                         progress_callback = progress_callback)
 
 
     def detect_sync(self, input_file_path: str,

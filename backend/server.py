@@ -127,8 +127,8 @@ async def detect():
     return JSONResponse(content = {"job_id": job_id}, status_code = 201)
 
 
-@app.post("/initialize")
-async def initialize():
+@app.post("/load_models")
+async def load_models(body : dict):
     app_gatector = getattr(app.state, "app_gatector", None)
     if app_gatector is None:
         return JSONResponse(content = {"status": "error", "message": "AppGatector not initialized"},
@@ -138,7 +138,8 @@ async def initialize():
     jobs[job_id] = {"queue": job_queue, "status": "running"}
     thread = threading.Thread(target = run_pipeline_job,
                               args = (app_gatector, job_id, job_queue),
-                              kwargs = {"method_name": "initialize", "method_kwargs": {}},
+                              kwargs = {"method_name": "load_models",
+                                        "method_kwargs": body},
                               daemon = True)
     thread.start()
     return JSONResponse(content = {"job_id": job_id}, status_code = 201)
