@@ -38,12 +38,12 @@ const GAZE_MODE_OPTIONS = [
   {
     value: "GazeFollow360",
     label: "GazeFollow360",
-    description: "Best SOTA model trained on Gaze360 and GazeFollow",
+    description: "Trained on Gaze360 and GazeFollow",
   },
   {
     value: "Gaze360",
     label: "Gaze360",
-    description: "Best model trained on Gaze360 only",
+    description: "Trained on Gaze360 only",
   },
 ] as const;
 
@@ -300,24 +300,25 @@ export default function Home() {
         </section>
 
         <section style={{ minHeight: 0, display: "flex", flexDirection: "column" }}>
-          <Card style={{ 
-            flex: 1, 
-            minHeight: 0, 
-            display: "flex", 
+          <Card style={{
+            flex: 1,
+            minHeight: 0,
+            display: "flex",
             flexDirection: "column",
             borderRadius: radius.outer,
           }}>
-            <CardHeader style={{ 
-              textAlign: "center",
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              justifyContent: "center",
-              flex: 1,
-            }}>
-              <CardTitle style={{ 
-                fontSize: fontSizes.lg, 
-                fontWeight: 600}}>
+            <CardHeader
+              style={{
+                textAlign: "center",
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                justifyContent: "center",
+                flexGrow: stream.status !== "done" || !stream.outputType ? 1 : 0,
+                flexShrink: 0,
+              }}
+            >
+              <CardTitle style={{ fontSize: fontSizes.lg, fontWeight: 600 }}>
                 Output
               </CardTitle>
               <CardDescription
@@ -327,11 +328,38 @@ export default function Home() {
                   color: "var(--muted-foreground)",
                 }}
               >
-                {stream.status === "done" && stream.outputType
-                  ? "Play or view the result below"
+                {stream.status === "done" && stream.outputType && stream.outputDir
+                  ? `${stream.outputDir}/predicted_gaze.${stream.outputType === "video" ? "mp4" : "png"}`
                   : "Result will appear here after detection"}
               </CardDescription>
             </CardHeader>
+            {stream.status === "done" && jobId && stream.outputType && (
+              <CardContent
+                style={{
+                  flex: 1,
+                  minHeight: 0,
+                  overflow: "auto",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                {stream.outputType === "video" ? (
+                  <video
+                    src={outputUrl(jobId)}
+                    controls
+                    playsInline
+                    style={{ maxWidth: "100%", maxHeight: "100%", height: "auto", borderRadius: "var(--radius)" }}
+                  />
+                ) : (
+                  <img
+                    src={outputUrl(jobId)}
+                    alt="Detection result"
+                    style={{ maxWidth: "100%", maxHeight: "100%", height: "auto", borderRadius: "var(--radius)" }}
+                  />
+                )}
+              </CardContent>
+            )}
           </Card>
         </section>
       </main>

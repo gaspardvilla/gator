@@ -40,19 +40,21 @@ function SelectTrigger({
       data-slot="select-trigger"
       data-size={size}
       className={cn(
-        "border-input data-[placeholder]:text-muted-foreground [&_svg:not([class*='text-'])]:text-muted-foreground focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive dark:bg-input/30 dark:hover:bg-input/50 flex w-fit items-center justify-between border bg-transparent whitespace-nowrap shadow-xs transition-[color,box-shadow] outline-none focus-visible:ring-[3px] disabled:cursor-not-allowed disabled:opacity-50 *:data-[slot=select-value]:line-clamp-1 *:data-[slot=select-value]:flex *:data-[slot=select-value]:items-center [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+        "border-input data-[placeholder]:text-muted-foreground [&_svg:not([class*='text-'])]:text-muted-foreground aria-invalid:ring-destructive/20 aria-invalid:border-destructive bg-background text-foreground flex w-fit items-center justify-between border whitespace-nowrap shadow-xs transition-[color,box-shadow] outline-none disabled:cursor-not-allowed disabled:opacity-50 *:data-[slot=select-value]:line-clamp-1 *:data-[slot=select-value]:flex *:data-[slot=select-value]:items-center [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
         className
       )}
-      style={{ 
-        gap: spacing[2], 
-        borderRadius: radius.inner, 
-        paddingLeft: spacing[3], 
-        paddingRight: spacing[2], 
-        paddingTop: spacing[2], 
-        paddingBottom: spacing[2], 
-        fontSize: fontSizes.sm, 
-        height, 
-        ...style }}
+      style={{
+        borderColor: "var(--foreground)",
+        gap: spacing[2],
+        borderRadius: radius.inner,
+        paddingLeft: spacing[3],
+        paddingRight: spacing[2],
+        paddingTop: spacing[2],
+        paddingBottom: spacing[2],
+        fontSize: fontSizes.sm,
+        height,
+        ...style,
+      }}
       {...props}
     >
       {children}
@@ -66,7 +68,7 @@ function SelectTrigger({
 function SelectContent({
   className,
   children,
-  position = "item-aligned",
+  position = "popper",
   align = "center",
   style,
   ...props
@@ -86,8 +88,9 @@ function SelectContent({
           className
         )}
         style={{
-          backgroundColor: "var(--popover)",
-          color: "var(--popover-foreground)",
+          backgroundColor: "var(--background)",
+          color: "var(--background)",
+          borderColor: "var(--border)",
           position: "relative",
           zIndex: 50,
           maxHeight: "var(--radix-select-content-available-height)",
@@ -127,8 +130,16 @@ function SelectLabel({
   return (
     <SelectPrimitive.Label
       data-slot="select-label"
-      className={cn("text-muted-foreground", className)}
-      style={{ paddingLeft: spacing[2], paddingRight: spacing[2], paddingTop: spacing[1.5], paddingBottom: spacing[1.5], fontSize: fontSizes.xs, ...style }}
+      className={cn(className)}
+      style={{
+        color: "var(--destructive)",
+        paddingLeft: spacing[2],
+        paddingRight: spacing[2],
+        paddingTop: spacing[1.5],
+        paddingBottom: spacing[1.5],
+        fontSize: fontSizes.xs,
+        ...style,
+      }}
       {...props}
     />
   )
@@ -144,10 +155,19 @@ function SelectItem({
     <SelectPrimitive.Item
       data-slot="select-item"
       className={cn(
-        "focus:bg-accent focus:text-accent-foreground [&_svg:not([class*='text-'])]:text-muted-foreground relative flex w-full cursor-default items-center outline-hidden select-none data-[disabled]:pointer-events-none data-[disabled]:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 *:[span]:last:flex *:[span]:last:items-center *:[span]:last:gap-2",
+        "bg-background hover:bg-card hover:text-foreground text-foreground relative flex w-full cursor-default items-center outline-hidden select-none data-[disabled]:pointer-events-none data-[disabled]:opacity-50 [&_svg:not([class*='text-'])]:text-muted-foreground [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 *:[span]:last:flex *:[span]:last:items-center *:[span]:last:gap-2",
         className
       )}
-      style={{ gap: spacing[2], paddingTop: spacing[1.5], paddingBottom: spacing[1.5], paddingRight: spacing[8], paddingLeft: spacing[2], fontSize: fontSizes.sm, ...style }}
+      style={{
+        gap: spacing[2],
+        paddingTop: spacing[1.5],
+        paddingBottom: spacing[1.5],
+        paddingRight: spacing[8],
+        paddingLeft: spacing[2],
+        fontSize: fontSizes.sm,
+        borderRadius: radius.inner,
+        ...style,
+      }}
       {...props}
     >
       <span
@@ -165,12 +185,14 @@ function SelectItem({
 
 function SelectSeparator({
   className,
+  style,
   ...props
 }: React.ComponentProps<typeof SelectPrimitive.Separator>) {
   return (
     <SelectPrimitive.Separator
       data-slot="select-separator"
-      className={cn("bg-border pointer-events-none -mx-1 my-1 h-px", className)}
+      className={cn("pointer-events-none -mx-1 my-1 h-px", className)}
+      style={{ backgroundColor: "var(--destructive)", ...style }}
       {...props}
     />
   )
@@ -178,6 +200,7 @@ function SelectSeparator({
 
 function SelectScrollUpButton({
   className,
+  style,
   ...props
 }: React.ComponentProps<typeof SelectPrimitive.ScrollUpButton>) {
   return (
@@ -187,6 +210,9 @@ function SelectScrollUpButton({
         "flex cursor-default items-center justify-center py-1",
         className
       )}
+      style={{ 
+        color: "var(--destructive)", 
+        backgroundColor: "var(--destructive)", ...style }}
       {...props}
     >
       <ChevronUpIcon className="size-4" />
@@ -196,6 +222,7 @@ function SelectScrollUpButton({
 
 function SelectScrollDownButton({
   className,
+  style,
   ...props
 }: React.ComponentProps<typeof SelectPrimitive.ScrollDownButton>) {
   return (
@@ -205,6 +232,9 @@ function SelectScrollDownButton({
         "flex cursor-default items-center justify-center py-1",
         className
       )}
+      style={{ 
+        color: "var(--destructive)", 
+        backgroundColor: "var(--destructive)", ...style }}
       {...props}
     >
       <ChevronDownIcon className="size-4" />
