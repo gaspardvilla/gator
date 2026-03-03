@@ -4,41 +4,6 @@ import numpy as np
 from torch.nn import functional as F
 
 
-
-def draw_arrow2D(image,
-                 gaze,
-                 position = None,
-                 head_size = None,
-                 d = 0.1,
-                 color = (255, 0, 0),
-                 thickness = 10,):
-    w, h = image.shape[1], image.shape[0]
-
-    if position is None:
-        position = [w // 2, h // 2]
-
-    if head_size:
-        length = head_size
-    else:
-        length = w * d
-
-    gaze_dir = gaze / np.linalg.norm(gaze)
-    dx = -length * gaze_dir[0]
-    dy = -length * gaze_dir[1]
-
-    cv2.arrowedLine(
-        image,
-        tuple(np.round(position).astype(np.int32)),
-        tuple(np.round([position[0] + dx, position[1] + dy]).astype(int)),
-        color,
-        thickness,
-        cv2.LINE_AA,
-        tipLength=0.2,
-    )
-    return image
-
-
-
 def draw_gaze(image,
               head_bbox,
               head_pid,
@@ -108,4 +73,37 @@ def draw_gaze(image,
         d=0.05,
         color=color,
         thickness=thickness_gaze,)
+    return image
+
+
+def draw_arrow2D(image,
+                 gaze,
+                 position = None,
+                 head_size = None,
+                 d = 0.1,
+                 color = (255, 0, 0),
+                 thickness = 10,):
+    w, h = image.shape[1], image.shape[0]
+
+    if position is None:
+        position = [w // 2, h // 2]
+
+    if head_size:
+        length = head_size
+    else:
+        length = w * d
+
+    gaze_dir = gaze / np.linalg.norm(gaze)
+    dx = -length * gaze_dir[0]
+    dy = -length * gaze_dir[1]
+
+    cv2.arrowedLine(
+        image,
+        tuple(np.round(position).astype(np.int32)),
+        tuple(np.round([position[0] + dx, position[1] + dy]).astype(int)),
+        color,
+        thickness,
+        cv2.LINE_AA,
+        tipLength=0.2,
+    )
     return image

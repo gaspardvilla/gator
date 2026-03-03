@@ -20,3 +20,8 @@ __pycache__/
 
 # Unitests
 unitest/
+
+
+# Debug
+debug_gdraw_gaze.py
+gdrawings.py
