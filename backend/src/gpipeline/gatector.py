@@ -197,7 +197,10 @@ class Gatector():
 
             # Prediction of the gaze
             with torch.no_grad():
-                pred = self.gaze_model(sample["images"].to(self.device))
+                if self.device == 'cuda':
+                    pred = self.gaze_model(sample["images"].to('cuda'))
+                else:
+                    pred = self.gaze_model(sample["images"].to('cpu'))
                 gaze = torch.nn.functional.normalize(pred["gaze"], p=2, dim=2, eps=1e-8)
                 t = gaze.size(1)
                 t = ((t // 2) if t == 1 or t % 2 != 0 else (t // 2) - 1)
@@ -360,7 +363,7 @@ class Gatector():
         ckpts = torch.load(ckpts_paths[self.gaze_training_mode], 
                            map_location = "cpu")
         model.load_state_dict(ckpts["state_dict"], strict = True)
-        model.to(self.device)
+        model.to('cuda') if self.device == 'cuda' else model.to('cpu')
         model.eval()
         self.gaze_model = model
 
