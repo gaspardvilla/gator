@@ -119,7 +119,10 @@ async def detect(body: dict | None = None):
                               args = (app_gatector, job_id, job_queue),
                               kwargs = {"method_name": "detect_sync",
                                         "method_kwargs": {"input_file_path": body["input_path"],
-                                                          "modality": body["modality"]}},
+                                                          "modality": body["modality"],
+                                                          "batch_size": body["batch_size"],
+                                                          "window_stride": body["window_stride"],
+                                                          "num_workers": body["num_workers" ]}},
                               daemon = True)
     thread.start()
     return JSONResponse(content = {"job_id": job_id}, status_code = 201)

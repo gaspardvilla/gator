@@ -25,6 +25,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { FileDropzone } from "@/components/file-dropzone";
+import { Input } from "@/components/ui/input";
 import { containerMaxWidth, fontSizes, radius, spacing } from "@/lib/sizes";
 import { toast } from "sonner";
 
@@ -47,12 +48,28 @@ const GAZE_MODE_OPTIONS = [
   },
 ] as const;
 
+const NB_WORKERS_OPTIONS = [
+  { value: 1, label: "1" },
+  { value: 2, label: "2" },
+  { value: 4, label: "4" },
+  { value: 8, label: "8" },
+] as const;
+
+const MODALITY_OPTIONS = [
+  { value: "image", label: "Image" },
+  { value: "video", label: "Video" },
+] as const;
+
 export default function Home() {
   const [jobId, setJobId] = useState<string | null>(null);
   const [loadModelsJobId, setLoadModelsJobId] = useState<string | null>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [device, setDevice] = useState<string>("cpu");
   const [gazeMode, setGazeMode] = useState<string>("GazeFollow360");
+  const [modality, setModality] = useState<string>("image");
+  const [batchSize, setBatchSize] = useState<number>(24);
+  const [windowStride, setWindowStride] = useState<number>(1);
+  const [numWorkers, setNumWorkers] = useState<number>(4);
 
   const { isSuccess: isHealthy, isLoading: healthLoading } = useQuery({
     queryKey: ["health"],
@@ -72,12 +89,21 @@ export default function Home() {
   const loadModelsStream = useDetectStream(loadModelsJobId);
 
   const detectMutation = useMutation({
-    mutationFn: async (file: File) => {
-      const { path } = await uploadFile(file);
-      const ext = file.name.toLowerCase().slice(file.name.lastIndexOf("."));
-      const modality = "image";
-      // const modality = ext === ".mp4" ? "video" : "image";
-      return startDetect({ input_path: path, modality });
+    mutationFn: async (payload: {
+      file: File;
+      modality: string;
+      batchSize: number;
+      windowStride: number;
+      numWorkers: number;
+    }) => {
+      const { path } = await uploadFile(payload.file);
+      return startDetect({
+        input_path: path,
+        modality: payload.modality,
+        batch_size: payload.batchSize,
+        window_stride: payload.windowStride,
+        num_workers: payload.numWorkers,
+      });
     },
     onSuccess: (data) => setJobId(data.job_id),
     onError: (err) => {
@@ -187,7 +213,7 @@ export default function Home() {
         >
           <Card style={{ 
             flexShrink: 0, 
-            gap: spacing[2] }}>
+            gap: spacing[0] }}>
             <CardHeader>
               <CardTitle
                 style={{
@@ -285,18 +311,105 @@ export default function Home() {
             onFileSelected={setSelectedFile}
             disabled={isRunning}
             style={{ flex: 1, minHeight: 0 }}
-            footer={
-              <>
-                <Button
-                  onClick={() => selectedFile && detectMutation.mutate(selectedFile)}
-                  disabled={!canRun}
-                  style={{ width: "100%" }}
-                >
-                  {isRunning ? "Running…" : "Run detection"}
-                </Button>
-              </>
-            }
           />
+          <Card style={{ flexShrink: 0 }}>
+            <CardHeader>
+              <CardTitle
+                style={{
+                  fontSize: fontSizes.lg,
+                  fontWeight: 600,
+                  textAlign: "center",
+                }}
+              >
+                Run options
+              </CardTitle>
+            </CardHeader>
+            <CardContent
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                gap: spacing[4],
+              }}
+            >
+              <div
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: "1fr 1fr",
+                  gap: spacing[4],
+                  width: "100%",
+                  maxWidth: "420px",
+                  margin: "0 auto",
+                }}
+              >
+                <Field orientation="horizontal">
+                  <FieldLabel>Modality</FieldLabel>
+                  <Select value={modality} onValueChange={setModality}>
+                    <SelectTrigger style={{ width: "80px", flexShrink: 0 }}>
+                      <SelectValue placeholder="Modality" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {MODALITY_OPTIONS.map((opt) => (
+                        <SelectItem key={opt.value} value={opt.value}>
+                          {opt.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </Field>
+                <Field orientation="horizontal">
+                  <FieldLabel>Window stride</FieldLabel>
+                  <Input
+                    type="number"
+                    min={1}
+                    value={windowStride}
+                    onChange={(e) => setWindowStride(parseInt(e.target.value, 10) || 1)}
+                    style={{ width: "42px", flexShrink: 0 }}
+                  />
+                </Field>
+                <Field orientation="horizontal">
+                  <FieldLabel>Batch size</FieldLabel>
+                  <Input
+                    type="number"
+                    min={1}
+                    value={batchSize}
+                    onChange={(e) => setBatchSize(parseInt(e.target.value, 10) || 24)}
+                    style={{ width: "50px", flexShrink: 0 }}
+                  />
+                </Field>
+                <Field orientation="horizontal">
+                  <FieldLabel>Nb workers</FieldLabel>
+                  <Select value={numWorkers.toString()} onValueChange={(value) => setNumWorkers(parseInt(value, 10) || 1)}>
+                    <SelectTrigger style={{ width: "62px", flexShrink: 0 }}>
+                      <SelectValue placeholder="Nb workers" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {NB_WORKERS_OPTIONS.map((opt) => (
+                        <SelectItem key={opt.value} value={opt.value.toString()}>
+                          {opt.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </Field>
+              </div>
+              <Button
+                style={{ width: "100%" }}
+                onClick={() =>
+                  selectedFile &&
+                  detectMutation.mutate({
+                    file: selectedFile,
+                    modality,
+                    batchSize,
+                    windowStride,
+                    numWorkers,
+                  })
+                }
+                disabled={!canRun}
+              >
+                {isRunning ? "Running…" : "Run detection"}
+              </Button>
+            </CardContent>
+          </Card>
         </section>
 
         <section style={{ minHeight: 0, display: "flex", flexDirection: "column" }}>

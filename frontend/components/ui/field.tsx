@@ -105,7 +105,7 @@ function FieldContent({ className, style, ...props }: React.ComponentProps<"div"
     <div
       data-slot="field-content"
       className={cn("group/field-content flex flex-1 flex-col leading-snug", className)}
-      style={{ gap: spacing[1.5], ...style }}
+      style={{ gap: spacing[1], ...style }}
       {...props}
     />
   )

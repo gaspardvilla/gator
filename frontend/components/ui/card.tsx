@@ -12,11 +12,11 @@ function Card({ className, style, ...props }: React.ComponentProps<"div">) {
         className
       )}
       style={{ 
-        gap: spacing[6], 
+        gap: spacing[2], 
         borderRadius: radius.outer, 
         borderColor: "var(--foreground)",
-        paddingTop: spacing[6], 
-        paddingBottom: spacing[6], 
+        paddingTop: spacing[4], 
+        paddingBottom: spacing[4], 
         ...style }}
       {...props}
     />
@@ -77,7 +77,12 @@ function CardContent({ className, style, ...props }: React.ComponentProps<"div">
     <div
       data-slot="card-content"
       className={cn(className)}
-      style={{ paddingLeft: spacing[6], paddingRight: spacing[6], ...style }}
+      style={{ 
+        paddingLeft: spacing[4], 
+        paddingRight: spacing[4], 
+        paddingTop: spacing[0], 
+        paddingBottom: spacing[0], 
+        ...style }}
       {...props}
     />
   )

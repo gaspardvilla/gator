@@ -60,10 +60,10 @@ export function FileDropzone({
         display: "flex",
         flexDirection: "column",
         gap: spacing[4],
-        paddingLeft: spacing[6],
-        paddingRight: spacing[6],
-        paddingTop: spacing[6],
-        paddingBottom: spacing[6],
+        paddingLeft: spacing[4],
+        paddingRight: spacing[4],
+        paddingTop: spacing[4],
+        paddingBottom: spacing[4],
         ...style,
       }}
     >

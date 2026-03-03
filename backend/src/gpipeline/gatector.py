@@ -39,12 +39,10 @@ COLORS = [
 
 
 class Gatector():
-    def __init__(self, batch_size: int,
-                 num_workers: int,
-                 window_stride: int = 1):
-        self.batch_size = batch_size
-        self.window_stride = window_stride
-        self.num_workers = num_workers
+    def __init__(self):
+        self.batch_size = None
+        self.window_stride = None
+        self.num_workers = None
         self._progress_callback = None
 
 
@@ -69,9 +67,15 @@ class Gatector():
 
 
     def run(self, input_file_path: str,
-            modality: str = "image",
-            progress_callback: Callable[[str], None] | None = None,) -> dict:
+            modality: str,
+            batch_size: int,
+            window_stride: int,
+            num_workers: int,
+            progress_callback: Callable[[str], None]) -> dict:
         # Set the progress callback
+        self.batch_size = batch_size
+        self.window_stride = window_stride
+        self.num_workers = num_workers
         self.progress_callback = progress_callback
         output_dir = os.path.dirname(input_file_path)
 

@@ -30,8 +30,10 @@ export type StartDetectResponse = { job_id: string };
 
 export type StartDetectBody = {
   input_path: string;
-  output_dir?: string;
-  modality?: string;
+  modality: string;
+  batch_size: number;
+  window_stride: number;
+  num_workers: number;
 };
 
 export async function startDetect(body: StartDetectBody): Promise<StartDetectResponse> {

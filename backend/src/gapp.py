@@ -7,9 +7,7 @@ logger = logging.getLogger(__name__)
 
 class AppGatector:
     def __init__(self):
-        self.gatector = Gatector(batch_size = 24,
-                                 num_workers = 4,
-                                 window_stride = 1)
+        self.gatector = Gatector()
 
 
     def load_models(self, device: str, 
@@ -21,19 +19,32 @@ class AppGatector:
 
 
     def detect_sync(self, input_file_path: str,
-                    modality: str = "image",
-                    progress_callback: Callable[[str], None] | None = None,) -> dict:
+                    modality: str,
+                    batch_size: int,
+                    window_stride: int,
+                    num_workers: int,
+                    progress_callback: Callable[[str], None]) -> dict:
         """Run the pipeline synchronously (for use in a background thread).
         Returns {'success': bool, 'data': {}}; on success data may include e.g. output_dir."""
         return self.gatector.run(input_file_path = input_file_path,
                                  modality = modality,
-                                 progress_callback = progress_callback,)
+                                 batch_size = batch_size,
+                                 window_stride = window_stride,
+                                 num_workers = num_workers,
+                                 progress_callback = progress_callback)
 
 
     async def detect(self, input_file_path: str,
-                     modality: str = 'image') -> dict:
+                     modality: str,
+                     batch_size: int,
+                     window_stride: int,
+                     num_workers: int,
+                     progress_callback: Callable[[str], None]) -> dict:
         """Legacy async entrypoint; runs sync pipeline. Prefer detect_sync from
         a thread for async API."""
-        return self.gatector.run(input_file_path = input_file_path,
-                                 modality = modality,
-                                 progress_callback = None)
+        return self.detect_sync(input_file_path = input_file_path,
+                                modality = modality,
+                                batch_size = batch_size,
+                                window_stride = window_stride,
+                                num_workers = num_workers,
+                                progress_callback = progress_callback)
