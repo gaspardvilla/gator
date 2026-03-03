@@ -14,6 +14,7 @@ function Card({ className, style, ...props }: React.ComponentProps<"div">) {
       style={{ 
         gap: spacing[6], 
         borderRadius: radius.outer, 
+        borderColor: "var(--foreground)",
         paddingTop: spacing[6], 
         paddingBottom: spacing[6], 
         ...style }}
