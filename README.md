@@ -1,29 +1,24 @@
 # Gator
-***
 
-# Installation steps
+## Prerequisites
 
-Before going further into the project, you need to have `uv` (ref. https://github.com/astral-sh/uv) and `ffmpeg` ref. installed on your computer.
+Install the following on your machine:
 
-This being installed, you would have to also have `git-lfs` installed to download the checkpoints of the models.
+- **[uv](https://github.com/astral-sh/uv)** — Python environment and backend dependencies
+- **[Node.js](https://nodejs.org/)** (LTS) — Frontend (npm)
+- **[ffmpeg](https://ffmpeg.org/)** — Video processing
 
+## Quick start
 
-# Run the application
+From the project root, run:
 
-After all requirements are well installed, run the following bash command:
-```
+```bash
 ./run_app.sh
 ```
 
-# Laaunch the backend server
+This will install backend dependencies, download model weights and checkpoints, install frontend dependencies, then start the backend (port 8000) and frontend (port 3000) together. Use Ctrl+C to stop both.
 
-```uv run uvicorn server:app --host 0.0.0.0 --port 8000```
+## API (backend)
 
-
-
-# Available commands
-
-```
-http GET localhost:8000/health
-http GET localhost:8000/detect
-```
+- `GET http://localhost:8000/health`
+- `GET http://localhost:8000/detect`
