@@ -12,10 +12,10 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi import FastAPI, File, HTTPException, UploadFile
 from fastapi.responses import FileResponse, JSONResponse, StreamingResponse
 
-from src.gapp import AppGatector
+from src.gapp import AppGator
 from src.gdata.upload_utils import ALLOWED_EXTENSIONS, get_next_capture_dir
 
-# Configure logging so gatector (and other src) logs appear in the terminal
+# Configure logging so gator (and other src) logs appear in the terminal
 logging.basicConfig(
     level = logging.DEBUG,
     format = "%(asctime)s [%(levelname)s] %(name)s: %(message)s",
@@ -28,12 +28,12 @@ logging.basicConfig(
 jobs: dict[str, dict] = {}
 
 
-def run_pipeline_job(app_gatector: AppGatector,
+def run_pipeline_job(app_gator: AppGator,
                      job_id: str,
                      job_queue: queue.Queue,
                      method_name: str,
                      method_kwargs: dict[str, Any] | None = None) -> None:
-    """Run an AppGatector method in a thread. Each method must return {'success': bool, 'data': dict}.
+    """Run an AppGator method in a thread. Each method must return {'success': bool, 'data': dict}.
     On success the done event is {checkpoint: 'done', **data}; on failure {checkpoint: 'error', message: data['message']}."""
     method_kwargs = method_kwargs or {}
 
@@ -41,7 +41,7 @@ def run_pipeline_job(app_gatector: AppGatector,
         job_queue.put({"checkpoint": checkpoint})
 
     try:
-        method = getattr(app_gatector, method_name)
+        method = getattr(app_gator, method_name)
         result = method(progress_callback=progress_callback, **method_kwargs)
         if result.get("success"):
             data = result.get("data", {})
@@ -60,9 +60,9 @@ def run_pipeline_job(app_gatector: AppGatector,
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    app.state.app_gatector = AppGatector()
+    app.state.app_gator = AppGator()
     yield
-    app.state.app_gatector = None
+    app.state.app_gator = None
 
 
 app = FastAPI(lifespan = lifespan)
@@ -75,12 +75,12 @@ app.add_middleware(CORSMiddleware,
 
 @app.get("/health")
 async def health():
-    app_gatector = getattr(app.state, "app_gatector", None)
-    if app_gatector is None:
+    app_gator = getattr(app.state, "app_gator", None)
+    if app_gator is None:
         return JSONResponse(
-            content = {"status": "error", "message": "AppGatector not initialized"},
+            content = {"status": "error", "message": "AppGator not initialized"},
             status_code = 503,)
-    return {"status": "ok", "gatector": "ready"}
+    return {"status": "ok", "gator": "ready"}
 
 
 @app.post("/upload")
@@ -108,15 +108,15 @@ async def upload(file: UploadFile = File(...)):
 
 @app.post("/detect")
 async def detect(body: dict | None = None):
-    app_gatector = getattr(app.state, "app_gatector", None)
-    if app_gatector is None:
-        return JSONResponse(content = {"status": "error", "message": "AppGatector not initialized"},
+    app_gator = getattr(app.state, "app_gator", None)
+    if app_gator is None:
+        return JSONResponse(content = {"status": "error", "message": "AppGator not initialized"},
                             status_code = 503)
     job_id = uuid.uuid4().hex
     job_queue: queue.Queue = queue.Queue()
     jobs[job_id] = {"queue": job_queue, "status": "running"}
     thread = threading.Thread(target = run_pipeline_job,
-                              args = (app_gatector, job_id, job_queue),
+                              args = (app_gator, job_id, job_queue),
                               kwargs = {"method_name": "detect_sync",
                                         "method_kwargs": {"input_file_path": body["input_path"],
                                                           "modality": body["modality"],
@@ -130,15 +130,15 @@ async def detect(body: dict | None = None):
 
 @app.post("/load_models")
 async def load_models(body : dict):
-    app_gatector = getattr(app.state, "app_gatector", None)
-    if app_gatector is None:
-        return JSONResponse(content = {"status": "error", "message": "AppGatector not initialized"},
+    app_gator = getattr(app.state, "app_gator", None)
+    if app_gator is None:
+        return JSONResponse(content = {"status": "error", "message": "AppGator not initialized"},
                             status_code = 503)
     job_id = uuid.uuid4().hex
     job_queue: queue.Queue = queue.Queue()
     jobs[job_id] = {"queue": job_queue, "status": "running"}
     thread = threading.Thread(target = run_pipeline_job,
-                              args = (app_gatector, job_id, job_queue),
+                              args = (app_gator, job_id, job_queue),
                               kwargs = {"method_name": "load_models",
                                         "method_kwargs": body},
                               daemon = True)

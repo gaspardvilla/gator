@@ -49,22 +49,22 @@
 :root {
   --radius: 12px;
   --background:  rgb(6, 10, 28);
-  --foreground:  #ffc400;
+  --foreground:  rgb(145, 210, 94); /*Yellow : #ffc400*/
   --card:  #0d1428;
-  --card-foreground:  #ffc400; /*rgb(249, 222, 116);*/
-  --popover:  #ffc400;
-  --popover-foreground:  #ffdc5f;
-  --primary:  #ffc400;
+  --card-foreground:  rgb(145, 210, 94);
+  --popover:  rgb(145, 210, 94);
+  --popover-foreground:  rgb(87, 175, 118); /*Yellow : #ffdc5*/
+  --primary:  rgb(145, 210, 94);
   --primary-foreground:  #fafafa;
   --secondary:  #f5f5f5;
   --secondary-foreground:  #353535;
   --muted:  #f5f5f5;
-  --muted-foreground:  #a07b00;
+  --muted-foreground:  rgb(87, 175, 118);
   --accent:  #f5f5f5;
   --accent-foreground:  #353535;
   --destructive:  #dc2626;
   --destructive-foreground:  #fafafa;
-  --border:  #ffdc5f;
+  --border:  rgb(87, 175, 118);
   --input:  #ebebeb;
   --ring:  #9a9a9a;
   --chart-1:  #e07c3e;

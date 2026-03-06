@@ -1,4 +1,4 @@
-# gatector
+# Gator
 ***
 
 # Installation steps

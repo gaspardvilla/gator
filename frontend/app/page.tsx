@@ -157,7 +157,7 @@ export default function Home() {
         overflow: "hidden",
         display: "flex",
         flexDirection: "column",
-        padding: spacing[6],
+        padding: spacing[2],
       }}
     >
       <header
@@ -177,7 +177,7 @@ export default function Home() {
             lineHeight: 1.2,
           }}
         >
-          Gatector
+          Gator
         </h1>
         <p
           style={{
@@ -186,7 +186,8 @@ export default function Home() {
             fontSize: fontSizes.subtitle,
           }}
         >
-          Extract 3D gaze from video or images. Upload a file, run detection, and view the result.
+          Gaze detecTor: extract 3D gaze from video or images. <br />
+          Upload a file, run detection, and view the result.
         </p>
       </header>
 

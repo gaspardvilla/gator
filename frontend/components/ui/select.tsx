@@ -40,7 +40,7 @@ function SelectTrigger({
       data-slot="select-trigger"
       data-size={size}
       className={cn(
-        "border-input data-[placeholder]:text-muted-foreground [&_svg:not([class*='text-'])]:text-muted-foreground aria-invalid:ring-destructive/20 aria-invalid:border-destructive bg-background text-foreground flex w-fit items-center justify-between border whitespace-nowrap shadow-xs transition-[color,box-shadow] outline-none disabled:cursor-not-allowed disabled:opacity-50 *:data-[slot=select-value]:line-clamp-1 *:data-[slot=select-value]:flex *:data-[slot=select-value]:items-center [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+        "border-input data-[placeholder]:text-foreground [&_svg:not([class*='text-'])]:text-foreground aria-invalid:ring-destructive/20 aria-invalid:border-destructive bg-background text-foreground flex w-fit items-center justify-between border whitespace-nowrap shadow-xs transition-[color,box-shadow] outline-none disabled:cursor-not-allowed disabled:opacity-50 *:data-[slot=select-value]:line-clamp-1 *:data-[slot=select-value]:flex *:data-[slot=select-value]:items-center [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
         className
       )}
       style={{
@@ -90,7 +90,7 @@ function SelectContent({
         style={{
           backgroundColor: "var(--background)",
           color: "var(--background)",
-          borderColor: "var(--border)",
+          borderColor: "var(--foreground)",
           position: "relative",
           zIndex: 50,
           maxHeight: "var(--radix-select-content-available-height)",
@@ -98,7 +98,7 @@ function SelectContent({
           transformOrigin: "var(--radix-select-content-transform-origin)",
           overflowX: "hidden",
           overflowY: "auto",
-          border: "1px solid var(--border)",
+          border: "1px solid var(--foreground)",
           borderRadius: radius.inner,
           ...style,
         }}
@@ -155,7 +155,7 @@ function SelectItem({
     <SelectPrimitive.Item
       data-slot="select-item"
       className={cn(
-        "bg-background hover:bg-card hover:text-foreground text-foreground relative flex w-full cursor-default items-center outline-hidden select-none data-[disabled]:pointer-events-none data-[disabled]:opacity-50 [&_svg:not([class*='text-'])]:text-muted-foreground [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 *:[span]:last:flex *:[span]:last:items-center *:[span]:last:gap-2",
+        "bg-background hover:bg-card hover:text-foreground text-foreground relative flex w-full cursor-default items-center outline-hidden select-none data-[disabled]:pointer-events-none data-[disabled]:opacity-50 [&_svg:not([class*='text-'])]:text-foreground [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 *:[span]:last:flex *:[span]:last:items-center *:[span]:last:gap-2",
         className
       )}
       style={{

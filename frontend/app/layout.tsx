@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Gatector",
+  title: "Gator",
   description: "3D gaze extraction from video",
 };
 

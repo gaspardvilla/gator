@@ -1,19 +1,19 @@
 import logging
 from typing import Callable
-from src.gpipeline.gatector import Gatector
+from src.gpipeline.gator import Gator
 
 logger = logging.getLogger(__name__)
 
 
-class AppGatector:
+class AppGator:
     def __init__(self):
-        self.gatector = Gatector()
+        self.gator = Gator()
 
 
     def load_models(self, device: str, 
                     gaze_training_mode: str,
                     progress_callback: Callable[[str], None] | None = None) -> dict:
-        return self.gatector.load_models(device = device,
+        return self.gator.load_models(device = device,
                                          gaze_training_mode = gaze_training_mode,
                                          progress_callback = progress_callback)
 
@@ -26,7 +26,7 @@ class AppGatector:
                     progress_callback: Callable[[str], None]) -> dict:
         """Run the pipeline synchronously (for use in a background thread).
         Returns {'success': bool, 'data': {}}; on success data may include e.g. output_dir."""
-        return self.gatector.run(input_file_path = input_file_path,
+        return self.gator.run(input_file_path = input_file_path,
                                  modality = modality,
                                  batch_size = batch_size,
                                  window_stride = window_stride,

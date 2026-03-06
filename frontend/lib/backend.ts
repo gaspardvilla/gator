@@ -1,6 +1,6 @@
 const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
 
-export type HealthResponse = { status: string; gatector?: string };
+export type HealthResponse = { status: string; gator?: string };
 
 export async function healthCheck(): Promise<HealthResponse> {
   const res = await fetch(`${API_BASE}/health`);
