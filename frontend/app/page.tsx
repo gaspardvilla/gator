@@ -157,7 +157,8 @@ export default function Home() {
         overflow: "hidden",
         display: "flex",
         flexDirection: "column",
-        padding: spacing[2],
+        paddingTop: spacing[2],
+        paddingBottom: spacing[6],
       }}
     >
       <header
@@ -174,7 +175,7 @@ export default function Home() {
           style={{
             fontSize: fontSizes.title,
             fontWeight: 600,
-            lineHeight: 1.2,
+            lineHeight: 1,
           }}
         >
           Gator
