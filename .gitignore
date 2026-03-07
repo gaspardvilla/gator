@@ -10,6 +10,7 @@ gaze3D/
 *.ckpt*
 *.jpg
 *.png
+!images/example.png
 *.jpeg
 *.mp4
 *.csv
