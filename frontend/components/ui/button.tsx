@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils"
 import { controlHeight, fontSizes, radius, spacing } from "@/lib/sizes"
 
 const buttonVariants = cva(
-  "cursor-pointer inline-flex items-center justify-center whitespace-nowrap font-medium transition-all disabled:cursor-not-allowed disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive",
+  "cursor-pointer inline-flex items-center justify-center whitespace-nowrap font-medium transition-all disabled:cursor-not-allowed disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive",
   {
     variants: {
       variant: {
@@ -55,12 +55,12 @@ function Button({
     size === "xs"
       ? { height: controlHeight.xs, gap: spacing[1], paddingLeft: spacing[2], paddingRight: spacing[2], fontSize: fontSizes.xs }
       : size === "sm"
-        ? { height: controlHeight.sm, gap: spacing[1.5], paddingLeft: spacing[3], paddingRight: spacing[2.5], fontSize: fontSizes.sm }
+        ? { height: controlHeight.sm, gap: spacing[1.5], paddingLeft: spacing[3], paddingRight: spacing[3], fontSize: fontSizes.sm }
         : size === "lg"
           ? { height: controlHeight.lg, gap: spacing[2], paddingLeft: spacing[6], paddingRight: spacing[6], fontSize: fontSizes.sm }
           : size === "icon" || size === "icon-xs" || size === "icon-sm" || size === "icon-lg"
             ? {}
-            : { height: controlHeight.default, gap: spacing[2], paddingLeft: spacing[4], paddingRight: spacing[3], paddingTop: spacing[2], paddingBottom: spacing[2], fontSize: fontSizes.sm }
+            : { height: controlHeight.default, gap: spacing[2], paddingLeft: spacing[4], paddingRight: spacing[4], paddingTop: spacing[2], paddingBottom: spacing[2], fontSize: fontSizes.sm }
 
   return (
     <Comp

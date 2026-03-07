@@ -13,6 +13,14 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
   Field,
   FieldDescription,
   FieldLabel,
@@ -71,7 +79,13 @@ export default function Home() {
   const [windowStride, setWindowStride] = useState<number>(1);
   const [numWorkers, setNumWorkers] = useState<number>(4);
 
-  const { isSuccess: isHealthy, isLoading: healthLoading } = useQuery({
+  const { 
+    isSuccess: isHealthy, 
+    isLoading: healthLoading,
+    isError: isHealthError,
+    error: healthError,
+    refetch: refetchHealth,
+  } = useQuery({
     queryKey: ["health"],
     queryFn: healthCheck,
     refetchInterval: 10_000,
@@ -161,6 +175,31 @@ export default function Home() {
         paddingBottom: spacing[6],
       }}
     >
+    <Dialog open={!isHealthy} onOpenChange={() => {}}>
+      <DialogContent showCloseButton={false}>
+        <DialogHeader>
+          <DialogTitle>
+            Backend unavailable
+          </DialogTitle>
+          <DialogDescription>
+            The app could not reach the backend. Make sure the server is running and{" "}
+            {process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000"} is correct.
+          </DialogDescription>
+        </DialogHeader>
+        <DialogFooter showCloseButton={false}>
+          <Button
+            style={{ 
+              width: "100px",
+              textAlign: "center",
+            }}
+            onClick={() => refetchHealth()}
+            disabled={healthLoading}
+          >
+            {healthLoading ? "Checking…" : "Retry"}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
       <header
         style={{
           flexShrink: 0,
