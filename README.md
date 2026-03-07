@@ -1,7 +1,6 @@
 ![alt text](https://github.com/gaspardvilla/gator/blob/main/images/example.png "Example")
 
 # Gator
-***
 
 ## Prerequisites
 
